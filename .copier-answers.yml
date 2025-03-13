@@ -6,4 +6,4 @@ package_author_name: Joshua Levy
 package_description: The knowledge agent shell (media kit)
 package_github_org: jlevy
 package_module: kash
-package_name: kash-media-kit
+package_name: kash-media

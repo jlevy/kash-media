@@ -1,11 +1,11 @@
 # ---- Project Info and Dependencies ----
 
 [project.urls]
-Repository = "https://github.com/jlevy/kash-media-kit"
+Repository = "https://github.com/jlevy/kash-media"
 # Homepage = "https://..."
 
 [project]
-name = "kash-media-kit"
+name = "kash-media"
 description = "The knowledge agent shell (media kit)"
 authors = [
     { name="Joshua Levy", email="joshua@cal.berkeley.edu" },
@@ -15,7 +15,20 @@ license = "AGPL-3.0-or-later"
 requires-python = ">=3.11,<4.0"
 dynamic = ["version"]
 
-dependencies = []
+dependencies = [
+    "kash-shell @ git+ssh://git@github.com/jlevy/kash-shell.git@main",
+    "typing-extensions>=4.11.1",
+    # For printing. Note weasyprint has install dep issues on macos depending on the python version.
+    # https://github.com/Kozea/WeasyPrint/issues/2112
+    # https://github.com/Kozea/WeasyPrint/issues/1448
+    "weasyprint>=63.1",
+    # For downloading media:
+    "yt-dlp>=2025.2.19",
+    "curl-cffi>=0.7.4",
+    # For screen capture and image processing:
+    "opencv-python>=4.11.0.86",
+    "scikit-image>=0.25.2",
+]
 
 [dependency-groups]
 dev = [
@@ -29,8 +42,9 @@ dev = [
 ]
 
 [project.scripts]
-# Add script entry points here.
-# kash-media-kit = "kash:main"
+# Entry point for this kit is the main shell, which will auto-detect
+# and import from kash.kits.
+kash-media = "kash.kits.media.__main__:main"
 
 
 # ---- Build system ----
@@ -44,6 +58,17 @@ build-backend = "hatchling.build"
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
+
+[tool.hatch.metadata]
+# For referencing git+ssh urls in dependencies.
+allow-direct-references = true
+
+# Explicitly configure top-level namespace for hatch.
+[tool.hatch.build.targets.wheel]
+packages = ["src/kash"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/kash" = "kash"
 
 [tool.uv-dynamic-versioning]
 vcs = "git"
