@@ -1,11 +1,15 @@
 # kash-media-kit
 
-\[ **☞☞☞ This is the readme for a project from the
-[simple-modern-uv](https://github.com/jlevy/simple-modern-uv) template.** Fill it in and
-delete this message!
-Below are brief instructions on setup and development workflows that you may use or
-modify for your project.
-\]
+See the main [kash](https://github.com/jlevy/kash) repo for general instructions.
+
+To run media kit, ensure you have uv set up then:
+
+```shell
+# Install all deps and run tests:
+make
+# Run kash with media kit actions enabled:
+uv run kash
+```
 
 ## Installing uv and Python
 
