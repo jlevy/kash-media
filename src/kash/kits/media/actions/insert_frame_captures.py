@@ -1,5 +1,3 @@
-from typing import List
-
 from chopdiff.divs import parse_divs
 from chopdiff.docs import search_tokens
 from chopdiff.html import TimestampExtractor
@@ -14,7 +12,7 @@ from kash.kits.media.tools.image_similarity import filter_similar_frames
 from kash.kits.media.tools.video_frames import capture_frames
 from kash.model import Format, Item, ItemType, Param
 from kash.util.format_utils import fmt_loc
-from kash.util.string_replace import insert_multiple, Insertion
+from kash.util.string_replace import Insertion, insert_multiple
 from kash.util.url import as_file_url
 from kash.web_content.file_cache_tools import cache_file, cache_resource
 from kash.workspaces import current_workspace
@@ -96,7 +94,7 @@ def insert_frame_captures(item: Item, threshold: float = 0.6) -> Item:
         len(unique_matches),
         len(extractor.offsets),
     )
-    insertions: List[Insertion] = []
+    insertions: list[Insertion] = []
     for i, (timestamp, index, offset) in enumerate(timestamp_matches):
         # Only process timestamps whose frames weren't filtered out
         if i not in kept_indices:

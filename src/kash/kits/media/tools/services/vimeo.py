@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 from typing_extensions import override
@@ -26,7 +26,7 @@ CHANNEL_PATTERN = r"^/([a-zA-Z0-9_-]+)$"
 
 class Vimeo(MediaService):
     @override
-    def canonicalize_and_type(self, url: Url) -> Tuple[Optional[Url], Optional[MediaUrlType]]:
+    def canonicalize_and_type(self, url: Url) -> tuple[Optional[Url], Optional[MediaUrlType]]:
         parsed_url = urlparse(url)
         if parsed_url.hostname == "vimeo.com":
             path = parsed_url.path
@@ -54,7 +54,7 @@ class Vimeo(MediaService):
     @override
     def metadata(self, url: Url, full: bool = False) -> MediaMetadata:
         url = not_none(self.canonicalize(url), "Not a recognized Vimeo URL")
-        vimeo_result: Dict[str, Any] = self._extract_info(url)
+        vimeo_result: dict[str, Any] = self._extract_info(url)
         return self._parse_metadata(vimeo_result, full=full)
 
     @override
@@ -76,21 +76,21 @@ class Vimeo(MediaService):
 
     @override
     def download_media(
-        self, url: Url, target_dir: Path, media_types: Optional[List[MediaType]] = None
-    ) -> Dict[MediaType, Path]:
+        self, url: Url, target_dir: Path, media_types: Optional[list[MediaType]] = None
+    ) -> dict[MediaType, Path]:
         url = not_none(self.canonicalize(url), "Not a recognized Vimeo URL")
         return ydl_download_media(url, target_dir, media_types)
 
     @override
-    def list_channel_items(self, url: Url) -> List[MediaMetadata]:
+    def list_channel_items(self, url: Url) -> list[MediaMetadata]:
         raise NotImplementedError()
 
-    def _extract_info(self, url: Url) -> Dict[str, Any]:
+    def _extract_info(self, url: Url) -> dict[str, Any]:
         url = not_none(self.canonicalize(url), "Not a recognized Vimeo URL")
         return ydl_extract_info(url)
 
     def _parse_metadata(
-        self, vimeo_result: Dict[str, Any], full: bool = False, **overrides: Dict[str, Any]
+        self, vimeo_result: dict[str, Any], full: bool = False, **overrides: dict[str, Any]
     ) -> MediaMetadata:
         try:
             media_id = vimeo_result["id"]

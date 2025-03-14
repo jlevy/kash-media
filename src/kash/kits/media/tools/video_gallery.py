@@ -1,5 +1,4 @@
 from dataclasses import asdict, dataclass
-from typing import List
 
 from frontmatter_format import to_yaml_string
 
@@ -24,16 +23,16 @@ class VideoInfo:
     youtube_id: str
     title: str
     description: str
-    topics: List[str]
+    topics: list[str]
 
 
 @dataclass
 class VideoGallery:
     title: str
-    videos: List[VideoInfo]
+    videos: list[VideoInfo]
 
 
-def video_gallery_config(items: List[Item]) -> Item:
+def video_gallery_config(items: list[Item]) -> Item:
     """
     Get an item with the config for a video gallery.
     """

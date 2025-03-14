@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 from urllib.parse import parse_qs, urlparse
 
 from frontmatter_format import to_yaml_string
@@ -12,11 +12,11 @@ from kash.errors import ApiResultError, InvalidInput
 from kash.file_tools.file_formats_model import MediaType
 from kash.kits.media.tools.yt_dlp_tools import parse_date, ydl_download_media, ydl_extract_info
 from kash.model.media_model import (
+    SERVICE_YOUTUBE,
     HeatmapValue,
     MediaMetadata,
     MediaService,
     MediaUrlType,
-    SERVICE_YOUTUBE,
 )
 from kash.util.type_utils import not_none
 from kash.util.url import Url
@@ -32,9 +32,8 @@ VIDEO_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{11}$")
 
 
 class YouTube(MediaService):
-
     @override
-    def canonicalize_and_type(self, url: Url) -> Tuple[Optional[Url], Optional[MediaUrlType]]:
+    def canonicalize_and_type(self, url: Url) -> tuple[Optional[Url], Optional[MediaUrlType]]:
         parsed_url = urlparse(url)
         if parsed_url.hostname == "youtu.be":
             video_id = self.get_media_id(url)
@@ -99,24 +98,24 @@ class YouTube(MediaService):
 
     @override
     def download_media(
-        self, url: Url, target_dir: Path, media_types: Optional[List[MediaType]] = None
-    ) -> Dict[MediaType, Path]:
+        self, url: Url, target_dir: Path, media_types: Optional[list[MediaType]] = None
+    ) -> dict[MediaType, Path]:
         url = not_none(self.canonicalize(url), "Not a recognized YouTube URL")
         return ydl_download_media(url, target_dir, media_types)
 
-    def _extract_info(self, url: Url) -> Dict[str, Any]:
+    def _extract_info(self, url: Url) -> dict[str, Any]:
         url = not_none(self.canonicalize(url), "Not a recognized YouTube URL")
         return ydl_extract_info(url)
 
     @override
     def metadata(self, url: Url, full: bool = False) -> MediaMetadata:
         url = not_none(self.canonicalize(url), "Not a recognized YouTube URL")
-        yt_result: Dict[str, Any] = self._extract_info(url)
+        yt_result: dict[str, Any] = self._extract_info(url)
 
         return self._parse_metadata(yt_result, full=full)
 
     @override
-    def list_channel_items(self, url: Url) -> List[MediaMetadata]:
+    def list_channel_items(self, url: Url) -> list[MediaMetadata]:
         """
         Get all video URLs and metadata from a YouTube channel or playlist.
         """
@@ -129,7 +128,7 @@ class YouTube(MediaService):
             log.warning("%s No videos found in the channel.", EMOJI_WARN)
             entries = []
 
-        video_meta_list: List[MediaMetadata] = []
+        video_meta_list: list[MediaMetadata] = []
 
         # TODO: Inspect and collect rest of the metadata here, like upload date etc.
         for value in entries:
@@ -145,7 +144,7 @@ class YouTube(MediaService):
         return video_meta_list
 
     def _parse_metadata(
-        self, yt_result: Dict[str, Any], full: bool = False, **overrides: Dict[str, Any]
+        self, yt_result: dict[str, Any], full: bool = False, **overrides: dict[str, Any]
     ) -> MediaMetadata:
         try:
             media_id = yt_result["id"]  # Renamed for clarity.
@@ -194,7 +193,7 @@ class YouTube(MediaService):
         return result
 
 
-def best_thumbnail(data: Dict[str, Any]) -> Optional[Url]:
+def best_thumbnail(data: dict[str, Any]) -> Optional[Url]:
     """
     Get the best thumbnail from YouTube metadata, which is of the form:
     {

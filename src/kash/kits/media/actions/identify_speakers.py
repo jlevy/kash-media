@@ -6,7 +6,7 @@ from kash.exec import kash_action
 from kash.exec.precondition_defs import has_html_body, has_text_body
 from kash.llm_tools.fuzzy_parsing import fuzzy_parse_json
 from kash.llm_tools.llm_completion import llm_template_completion
-from kash.model import Item, ItemType, LLM, Message, MessageTemplate
+from kash.model import LLM, Item, ItemType, Message, MessageTemplate
 from kash.text_formatting.citations import html_speaker_id_span
 from kash.text_formatting.speaker_labels import find_speaker_labels
 from kash.util.string_replace import replace_multiple

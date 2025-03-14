@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List
 
 import cv2
 from strif import atomic_output_file
@@ -14,11 +13,11 @@ log = get_logger(__name__)
 
 def capture_frames(
     video_file: Path,
-    timestamps: List[float],
+    timestamps: list[float],
     target_dir: Path,
     prefix: str = "frame_",
     target_pattern: str = "{prefix}_{frame_number:04d}.jpg",
-) -> List[Path]:
+) -> list[Path]:
     """
     Capture frames at given timestamps and save them as JPG images using the provided pattern.
     """

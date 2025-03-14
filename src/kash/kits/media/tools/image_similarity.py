@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import List
 
 import cv2
 import numpy as np
@@ -21,7 +20,7 @@ def frames_are_similar(frame1: np.ndarray, frame2: np.ndarray, threshold: float 
     return score > threshold
 
 
-def filter_similar_frames(frame_paths: List[Path], threshold: float = 0.95) -> List[int]:
+def filter_similar_frames(frame_paths: list[Path], threshold: float = 0.95) -> list[int]:
     """
     Take a list of frame paths and return indices of unique frames,
     where each is sufficiently different from its predecessor.

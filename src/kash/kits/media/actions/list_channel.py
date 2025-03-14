@@ -3,7 +3,7 @@ from kash.errors import InvalidInput
 from kash.exec import kash_action
 from kash.exec.precondition_defs import is_url_item
 from kash.media_base.media_services import canonicalize_media_url, list_channel_items
-from kash.model import ActionInput, ActionResult, Item, NO_ARGS
+from kash.model import NO_ARGS, ActionInput, ActionResult, Item
 
 log = get_logger(__name__)
 

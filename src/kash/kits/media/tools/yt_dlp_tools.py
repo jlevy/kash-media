@@ -2,7 +2,7 @@ import os
 import tempfile
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import yt_dlp
 from frontmatter_format import to_yaml_string
@@ -11,7 +11,6 @@ from kash.config.logger import get_logger
 from kash.errors import ApiResultError
 from kash.file_tools.file_formats_model import MediaType
 from kash.util.url import Url
-
 
 log = get_logger(__name__)
 
@@ -24,7 +23,7 @@ def parse_date(upload_date: str | date) -> date:
     raise ValueError(f"Invalid date: {upload_date}")
 
 
-def ydl_extract_info(url: Url) -> Dict[str, Any]:
+def ydl_extract_info(url: Url) -> dict[str, Any]:
     ydl_opts = {
         "extract_flat": "in_playlist",  # Extract metadata only, without downloading.
         "quiet": True,
@@ -43,8 +42,8 @@ def ydl_extract_info(url: Url) -> Dict[str, Any]:
 
 
 def ydl_download_media(
-    url: Url, target_dir: Path | None = None, media_types: Optional[List[MediaType]] = None
-) -> Dict[MediaType, Path]:
+    url: Url, target_dir: Path | None = None, media_types: Optional[list[MediaType]] = None
+) -> dict[MediaType, Path]:
     """
     Download and convert to mp3 and mp4 using yt_dlp, which is generally the best
     library for this.

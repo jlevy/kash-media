@@ -1,16 +1,15 @@
 from textwrap import indent
-from typing import List
 
 from chopdiff.docs import (
     BOF_TOK,
     EOF_TOK,
     PARA_BR_TOK,
-    search_tokens,
     SENT_BR_TOK,
     SentIndex,
     TextDoc,
     TextUnit,
     TokenMapping,
+    search_tokens,
 )
 from chopdiff.html import ContentNotFound, TimestampExtractor
 
@@ -18,7 +17,7 @@ from kash.config.logger import get_logger
 from kash.errors import InvalidInput, UnexpectedError
 from kash.exec import kash_action
 from kash.exec.precondition_defs import has_timestamps, is_text_doc
-from kash.model import common_params, Format, Item, ItemType
+from kash.model import Format, Item, ItemType, common_params
 from kash.text_formatting.citations import add_citation_to_text, format_timestamp_citation
 from kash.util.format_utils import fmt_loc
 from kash.util.type_utils import not_none
@@ -93,8 +92,8 @@ def backfill_timestamps(item: Item, chunk_unit: TextUnit = TextUnit.paragraphs) 
 
     output_item = item.derived_copy(type=ItemType.doc, format=Format.md_html)
 
-    sent_index_list: List[SentIndex] = []
-    timestamp_list: List[float] = []
+    sent_index_list: list[SentIndex] = []
+    timestamp_list: list[float] = []
 
     for wordtok_offset, (wordtok, sent_index) in enumerate(
         item_doc.as_wordtok_to_sent(bof_eof=True)

@@ -1,6 +1,6 @@
 from datetime import date
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 from urllib.parse import parse_qs, urlparse
 
 from frontmatter_format import to_yaml_string
@@ -12,7 +12,7 @@ from kash.config.text_styles import EMOJI_WARN
 from kash.errors import ApiResultError
 from kash.file_tools.file_formats_model import MediaType
 from kash.kits.media.tools.yt_dlp_tools import ydl_download_media, ydl_extract_info
-from kash.model.media_model import MediaMetadata, MediaService, MediaUrlType, SERVICE_APPLE_PODCASTS
+from kash.model.media_model import SERVICE_APPLE_PODCASTS, MediaMetadata, MediaService, MediaUrlType
 from kash.util.type_utils import not_none
 from kash.util.url import Url
 
@@ -31,9 +31,8 @@ log = get_logger(__name__)
 
 
 class ApplePodcasts(MediaService):
-
     @override
-    def canonicalize_and_type(self, url: Url) -> Tuple[Optional[Url], Optional[MediaUrlType]]:
+    def canonicalize_and_type(self, url: Url) -> tuple[Optional[Url], Optional[MediaUrlType]]:
         parsed_url = urlparse(url)
         if parsed_url.hostname in ("podcasts.apple.com", "itunes.apple.com"):
             path_parts = parsed_url.path.split("/")
@@ -70,7 +69,7 @@ class ApplePodcasts(MediaService):
     @override
     def metadata(self, url: Url, full: bool = False) -> MediaMetadata:
         url = not_none(self.canonicalize(url), "Not a recognized Apple Podcasts URL")
-        yt_result: Dict[str, Any] = self._extract_info(url)
+        yt_result: dict[str, Any] = self._extract_info(url)
 
         return self._parse_metadata(yt_result, full=full)
 
@@ -92,17 +91,17 @@ class ApplePodcasts(MediaService):
 
     @override
     def download_media(
-        self, url: Url, target_dir: Path, media_types: Optional[List[MediaType]] = None
-    ) -> Dict[MediaType, Path]:
+        self, url: Url, target_dir: Path, media_types: Optional[list[MediaType]] = None
+    ) -> dict[MediaType, Path]:
         url = not_none(self.canonicalize(url), "Not a recognized Apple Podcasts URL")
         return ydl_download_media(url, target_dir, media_types)
 
-    def _extract_info(self, url: Url) -> Dict[str, Any]:
+    def _extract_info(self, url: Url) -> dict[str, Any]:
         url = not_none(self.canonicalize(url), "Not a recognized Apple Podcasts URL")
         return ydl_extract_info(url)
 
     @override
-    def list_channel_items(self, url: Url) -> List[MediaMetadata]:
+    def list_channel_items(self, url: Url) -> list[MediaMetadata]:
         result = self._extract_info(url)
 
         if "entries" in result:
@@ -111,7 +110,7 @@ class ApplePodcasts(MediaService):
             log.warning("%s No episodes found in the podcast.", EMOJI_WARN)
             entries = []
 
-        episode_meta_list: List[MediaMetadata] = []
+        episode_meta_list: list[MediaMetadata] = []
 
         for entry in entries:
             episode_meta_list.append(self._parse_metadata(entry))
@@ -121,7 +120,7 @@ class ApplePodcasts(MediaService):
         return episode_meta_list
 
     def _parse_metadata(
-        self, yt_result: Dict[str, Any], full: bool = False, **overrides: Dict[str, Any]
+        self, yt_result: dict[str, Any], full: bool = False, **overrides: dict[str, Any]
     ) -> MediaMetadata:
         try:
             media_id = yt_result["id"]
