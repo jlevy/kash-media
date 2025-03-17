@@ -10,7 +10,7 @@ from strif import atomic_output_file
 
 from kash.config.logger import get_logger
 from kash.config.settings import APP_NAME
-from kash.kits.media.tools import media_templates_dir
+from kash.kits.media.libs import media_templates_dir
 from kash.web_gen import base_templates_dir as common_templates_dir
 from kash.web_gen.template_render import render_web_template
 

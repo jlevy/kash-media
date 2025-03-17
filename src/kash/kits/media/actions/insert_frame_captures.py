@@ -5,16 +5,16 @@ from chopdiff.html.html_in_md import html_img, md_para
 
 from kash.config.logger import get_logger
 from kash.errors import ContentError, InvalidInput
-from kash.exec import kash_action, register_precondition
-from kash.exec.precondition_defs import has_timestamps, is_text_doc
-from kash.file_tools.file_formats_model import MediaType
-from kash.kits.media.tools.image_similarity import filter_similar_frames
-from kash.kits.media.tools.video_frames import capture_frames
+from kash.exec import kash_action, kash_precondition
+from kash.exec.preconditions import has_timestamps, is_text_doc
+from kash.kits.media.libs.image_similarity import filter_similar_frames
+from kash.kits.media.libs.video_frames import capture_frames
 from kash.model import Format, Item, ItemType, Param
-from kash.util.format_utils import fmt_loc
-from kash.util.string_replace import Insertion, insert_multiple
-from kash.util.url import as_file_url
-from kash.web_content.file_cache_tools import cache_file, cache_resource
+from kash.utils.common.format_utils import fmt_loc
+from kash.utils.common.string_replace import Insertion, insert_multiple
+from kash.utils.common.url import as_file_url
+from kash.utils.file_utils.file_formats_model import MediaType
+from kash.web_content.file_cache_utils import cache_file, cache_resource
 from kash.workspaces import current_workspace
 from kash.workspaces.source_items import find_upstream_resource
 
@@ -25,7 +25,7 @@ FRAME_CAPTURE = "frame-capture"
 """Class name for a frame capture from a video."""
 
 
-@register_precondition
+@kash_precondition
 def has_frame_captures(item: Item) -> bool:
     return bool(item.body and item.body.find(f'<img class="{FRAME_CAPTURE}">') != -1)
 

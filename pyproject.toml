@@ -42,7 +42,7 @@ dev = [
 [project.scripts]
 # Entry point for this kit is the main shell, which will auto-detect
 # and import from kash.kits.
-kash-media = "kash.kits.media.__main__:main"
+# kash-media = "kash.kits.media.__main__:main"
 
 
 # ---- Build system ----

@@ -3,10 +3,10 @@ from chopdiff.docs import Paragraph, TextDoc, TextUnit
 
 from kash.config.logger import get_logger
 from kash.errors import InvalidInput
-from kash.exec import kash_action, register_precondition
+from kash.exec import kash_action, kash_precondition
 from kash.exec.llm_transforms import llm_transform_str
 from kash.model import Format, Item, ItemType, LLMOptions, Message, MessageTemplate
-from kash.util.task_stack import task_stack
+from kash.utils.common.task_stack import task_stack
 
 log = get_logger(__name__)
 
@@ -70,7 +70,7 @@ ANNOTATED_PARA = "annotated-para"
 PARA_CAPTION = "para-caption"
 
 
-@register_precondition
+@kash_precondition
 def has_annotated_paras(item: Item) -> bool:
     """
     Useful to check if an item has already been annotated with captions.

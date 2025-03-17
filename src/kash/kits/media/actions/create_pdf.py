@@ -3,11 +3,11 @@ from os.path import join
 from kash.config.logger import get_logger
 from kash.errors import InvalidInput
 from kash.exec import kash_action
-from kash.exec.precondition_defs import has_html_body, has_text_body
-from kash.kits.media.tools.pdf_output import html_to_pdf
-from kash.llm_tools.clean_headings import clean_heading
+from kash.exec.preconditions import has_html_body, has_text_body
+from kash.kits.media.libs.pdf_output import html_to_pdf
+from kash.llm_utils.clean_headings import clean_heading
 from kash.model import FileExt, Format, Item, ItemType
-from kash.util.format_utils import fmt_loc
+from kash.utils.common.format_utils import fmt_loc
 from kash.workspaces import current_workspace
 
 log = get_logger(__name__)

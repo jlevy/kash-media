@@ -3,13 +3,13 @@ import json
 from kash.config.logger import get_logger
 from kash.errors import ApiResultError, InvalidInput
 from kash.exec import kash_action
-from kash.exec.precondition_defs import has_html_body, has_text_body
-from kash.llm_tools.fuzzy_parsing import fuzzy_parse_json
-from kash.llm_tools.llm_completion import llm_template_completion
+from kash.exec.preconditions import has_html_body, has_text_body
+from kash.kits.media.libs.speaker_labels import find_speaker_labels
+from kash.llm_utils.fuzzy_parsing import fuzzy_parse_json
+from kash.llm_utils.llm_completion import llm_template_completion
+from kash.media_base.timestamp_citations import html_speaker_id_span
 from kash.model import LLM, Item, ItemType, Message, MessageTemplate
-from kash.text_formatting.citations import html_speaker_id_span
-from kash.text_formatting.speaker_labels import find_speaker_labels
-from kash.util.string_replace import replace_multiple
+from kash.utils.common.string_replace import replace_multiple
 
 log = get_logger(__name__)
 

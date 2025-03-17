@@ -1,6 +1,6 @@
 from kash.config.logger import get_logger
 from kash.exec import kash_action
-from kash.exec.precondition_defs import is_audio_resource, is_url_item, is_video_resource
+from kash.exec.preconditions import is_audio_resource, is_url_item, is_video_resource
 from kash.kits.media.actions.add_description import add_description
 from kash.kits.media.actions.add_summary_bullets import add_summary_bullets
 from kash.kits.media.actions.caption_paras import caption_paras
