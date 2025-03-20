@@ -15,7 +15,7 @@ from kash.utils.common.string_replace import Insertion, insert_multiple
 from kash.utils.common.url import as_file_url
 from kash.utils.file_utils.file_formats_model import MediaType
 from kash.web_content.file_cache_utils import cache_file, cache_resource
-from kash.workspaces import current_workspace
+from kash.workspaces import current_ws
 from kash.workspaces.source_items import find_upstream_resource
 
 log = get_logger(__name__)
@@ -64,7 +64,7 @@ def insert_frame_captures(item: Item, threshold: float = 0.6) -> Item:
     )
 
     # Extract frame captures.
-    target_dir = current_workspace().base_dir / "assets"
+    target_dir = current_ws().base_dir / "assets"
     timestamps = [timestamp for timestamp, _index, _offset in timestamp_matches]
     frame_paths = capture_frames(video_path, timestamps, target_dir, prefix=item.slug_name())
 

@@ -8,7 +8,7 @@ from kash.media_base.media_tools import cache_and_transcribe
 from kash.model import FileExt, Format, Item, ItemType, common_params
 from kash.utils.common.type_utils import not_none
 from kash.utils.common.url import as_file_url
-from kash.workspaces import current_workspace
+from kash.workspaces import current_ws
 
 log = get_logger(__name__)
 
@@ -27,7 +27,7 @@ def transcribe(item: Item, language: str = "en") -> Item:
     if item.url:
         url = item.url
     else:
-        url = as_file_url(current_workspace().base_dir / not_none(item.store_path))
+        url = as_file_url(current_ws().base_dir / not_none(item.store_path))
 
     transcription = cache_and_transcribe(url, language=language)
 

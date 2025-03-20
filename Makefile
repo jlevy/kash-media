@@ -3,7 +3,7 @@
 
 .DEFAULT_GOAL := default
 
-.PHONY: default install lint test upgrade build clean
+.PHONY: default install lint test run upgrade build clean
 
 default: install lint test
 
@@ -15,6 +15,9 @@ lint:
 
 test:
 	uv run pytest
+
+run: install lint test
+	uv run kash
 
 upgrade:
 	uv sync --upgrade

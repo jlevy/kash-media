@@ -8,7 +8,7 @@ from kash.kits.media.libs.pdf_output import html_to_pdf
 from kash.llm_utils.clean_headings import clean_heading
 from kash.model import FileExt, Format, Item, ItemType
 from kash.utils.common.format_utils import fmt_loc
-from kash.workspaces import current_workspace
+from kash.workspaces import current_ws
 
 log = get_logger(__name__)
 
@@ -25,9 +25,9 @@ def create_pdf(item: Item) -> Item:
         raise InvalidInput(f"Item must have a body: {item}")
 
     pdf_item = item.derived_copy(type=ItemType.export, format=Format.pdf, file_ext=FileExt.pdf)
-    pdf_path, _found, _old_pdf_path = current_workspace().store_path_for(pdf_item)
+    pdf_path, _found, _old_pdf_path = current_ws().store_path_for(pdf_item)
     log.message("Will save PDF to: %s", fmt_loc(pdf_path))
-    base_dir = current_workspace().base_dir
+    base_dir = current_ws().base_dir
     full_pdf_path = join(base_dir, pdf_path)
 
     clean_title = clean_heading(item.abbrev_title())
