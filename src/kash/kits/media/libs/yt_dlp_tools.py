@@ -2,7 +2,7 @@ import os
 import tempfile
 from datetime import date
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import yt_dlp
 from frontmatter_format import to_yaml_string
@@ -42,7 +42,7 @@ def ydl_extract_info(url: Url) -> dict[str, Any]:
 
 
 def ydl_download_media(
-    url: Url, target_dir: Path | None = None, media_types: Optional[list[MediaType]] = None
+    url: Url, target_dir: Path | None = None, media_types: list[MediaType] | None = None
 ) -> dict[MediaType, Path]:
     """
     Download and convert to mp3 and mp4 using yt_dlp, which is generally the best
@@ -53,6 +53,7 @@ def ydl_download_media(
         media_types = [MediaType.audio, MediaType.video]
 
     temp_dir = target_dir or tempfile.mkdtemp()
+    ydl_opts: dict[str, Any]
     if MediaType.video in media_types:
         ydl_opts = {
             # Try for best video+audio, fall back to best available.
@@ -88,7 +89,7 @@ def ydl_download_media(
         }
 
     # Use our logger.
-    ydl_opts["logger"] = log
+    ydl_opts["logger"] = log  # pylance: ignore
 
     log.info("Extracting media from %s at %s using ydl_opts: %s", url, temp_dir, ydl_opts)
 
@@ -107,12 +108,12 @@ def ydl_download_media(
         if os.path.exists(mp3_path):
             result_paths[MediaType.audio] = Path(mp3_path)
         else:
-            log.warn("mp3 download not found: %s", mp3_path)
+            log.warning("mp3 download not found: %s", mp3_path)
     if MediaType.video in media_types:
         mp4_path = os.path.splitext(media_file_path)[0] + ".mp4"
         if os.path.exists(mp4_path):
             result_paths[MediaType.video] = Path(mp4_path)
         else:
-            log.warn("mp4 download not found: %s", mp4_path)
+            log.warning("mp4 download not found: %s", mp4_path)
 
     return result_paths

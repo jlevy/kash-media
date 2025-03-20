@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from frontmatter_format import to_yaml_string
@@ -33,7 +33,7 @@ VIDEO_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{11}$")
 
 class YouTube(MediaService):
     @override
-    def canonicalize_and_type(self, url: Url) -> tuple[Optional[Url], Optional[MediaUrlType]]:
+    def canonicalize_and_type(self, url: Url) -> tuple[Url | None, MediaUrlType | None]:
         parsed_url = urlparse(url)
         if parsed_url.hostname == "youtu.be":
             video_id = self.get_media_id(url)
@@ -68,7 +68,7 @@ class YouTube(MediaService):
         return None, None
 
     @override
-    def get_media_id(self, url: Url) -> Optional[str]:
+    def get_media_id(self, url: Url) -> str | None:
         parsed_url = urlparse(url)
         if parsed_url.hostname == "youtu.be":
             video_id = parsed_url.path[1:]
@@ -82,7 +82,7 @@ class YouTube(MediaService):
         return None
 
     @override
-    def thumbnail_url(self, url: Url) -> Optional[Url]:
+    def thumbnail_url(self, url: Url) -> Url | None:
         id = self.get_media_id(url)
         return Url(f"https://img.youtube.com/vi/{id}/sddefault.jpg") if id else None
         # Others:
@@ -98,7 +98,7 @@ class YouTube(MediaService):
 
     @override
     def download_media(
-        self, url: Url, target_dir: Path, media_types: Optional[list[MediaType]] = None
+        self, url: Url, target_dir: Path, media_types: list[MediaType] | None = None
     ) -> dict[MediaType, Path]:
         url = not_none(self.canonicalize(url), "Not a recognized YouTube URL")
         return ydl_download_media(url, target_dir, media_types)
@@ -193,7 +193,7 @@ class YouTube(MediaService):
         return result
 
 
-def best_thumbnail(data: dict[str, Any]) -> Optional[Url]:
+def best_thumbnail(data: dict[str, Any]) -> Url | None:
     """
     Get the best thumbnail from YouTube metadata, which is of the form:
     {

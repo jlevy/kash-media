@@ -1,10 +1,11 @@
 from pathlib import Path
+from typing import Any
 
 import cv2
-import numpy as np
+from numpy.typing import NDArray
 
 
-def frames_are_similar(frame1: np.ndarray, frame2: np.ndarray, threshold: float = 0.95) -> bool:
+def frames_are_similar(frame1: NDArray[Any], frame2: NDArray[Any], threshold: float = 0.95) -> bool:
     """
     Compare two frames to determine if they are similar based on structural similarity.
     Returns True if frames are similar above the threshold.
@@ -15,7 +16,10 @@ def frames_are_similar(frame1: np.ndarray, frame2: np.ndarray, threshold: float 
     gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
     gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
-    score, _ = structural_similarity(gray1, gray2, full=True)
+    # The structural_similarity function returns different values depending on 'full' parameter
+    # When full=True, it returns (score, diff_image)
+    result = structural_similarity(gray1, gray2, full=True)
+    score = result[0]  # Get just the score
 
     return score > threshold
 

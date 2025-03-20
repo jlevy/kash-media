@@ -1,6 +1,6 @@
 from datetime import date
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from frontmatter_format import to_yaml_string
@@ -32,7 +32,7 @@ log = get_logger(__name__)
 
 class ApplePodcasts(MediaService):
     @override
-    def canonicalize_and_type(self, url: Url) -> tuple[Optional[Url], Optional[MediaUrlType]]:
+    def canonicalize_and_type(self, url: Url) -> tuple[Url | None, MediaUrlType | None]:
         parsed_url = urlparse(url)
         if parsed_url.hostname in ("podcasts.apple.com", "itunes.apple.com"):
             path_parts = parsed_url.path.split("/")
@@ -53,7 +53,7 @@ class ApplePodcasts(MediaService):
         return None, None
 
     @override
-    def get_media_id(self, url: Url) -> Optional[str]:
+    def get_media_id(self, url: Url) -> str | None:
         parsed_url = urlparse(url)
         if parsed_url.hostname in ("podcasts.apple.com", "itunes.apple.com"):
             path_parts = parsed_url.path.split("/")
@@ -74,7 +74,7 @@ class ApplePodcasts(MediaService):
         return self._parse_metadata(yt_result, full=full)
 
     @override
-    def thumbnail_url(self, url: Url) -> Optional[Url]:
+    def thumbnail_url(self, url: Url) -> Url | None:
         # Apple Podcasts doesn't have a standardized thumbnail URL format.
         # We'll need to extract this from the metadata.
         try:
@@ -91,7 +91,7 @@ class ApplePodcasts(MediaService):
 
     @override
     def download_media(
-        self, url: Url, target_dir: Path, media_types: Optional[list[MediaType]] = None
+        self, url: Url, target_dir: Path, media_types: list[MediaType] | None = None
     ) -> dict[MediaType, Path]:
         url = not_none(self.canonicalize(url), "Not a recognized Apple Podcasts URL")
         return ydl_download_media(url, target_dir, media_types)
@@ -120,7 +120,10 @@ class ApplePodcasts(MediaService):
         return episode_meta_list
 
     def _parse_metadata(
-        self, yt_result: dict[str, Any], full: bool = False, **overrides: dict[str, Any]
+        self,
+        yt_result: dict[str, Any],
+        full: bool = False,
+        **overrides: dict[str, Any],
     ) -> MediaMetadata:
         try:
             media_id = yt_result["id"]

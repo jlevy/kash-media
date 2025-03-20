@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 from typing_extensions import override
@@ -26,7 +26,7 @@ CHANNEL_PATTERN = r"^/([a-zA-Z0-9_-]+)$"
 
 class Vimeo(MediaService):
     @override
-    def canonicalize_and_type(self, url: Url) -> tuple[Optional[Url], Optional[MediaUrlType]]:
+    def canonicalize_and_type(self, url: Url) -> tuple[Url | None, MediaUrlType | None]:
         parsed_url = urlparse(url)
         if parsed_url.hostname == "vimeo.com":
             path = parsed_url.path
@@ -39,7 +39,7 @@ class Vimeo(MediaService):
         return None, None
 
     @override
-    def get_media_id(self, url: Url) -> Optional[str]:
+    def get_media_id(self, url: Url) -> str | None:
         parsed_url = urlparse(url)
         if parsed_url.hostname == "vimeo.com":
             path = parsed_url.path
@@ -58,7 +58,7 @@ class Vimeo(MediaService):
         return self._parse_metadata(vimeo_result, full=full)
 
     @override
-    def thumbnail_url(self, url: Url) -> Optional[Url]:
+    def thumbnail_url(self, url: Url) -> Url | None:
         vimeo_result = self._extract_info(url)
         thumbnails = vimeo_result.get("thumbnails", [])
         if thumbnails:
@@ -76,7 +76,7 @@ class Vimeo(MediaService):
 
     @override
     def download_media(
-        self, url: Url, target_dir: Path, media_types: Optional[list[MediaType]] = None
+        self, url: Url, target_dir: Path, media_types: list[MediaType] | None = None
     ) -> dict[MediaType, Path]:
         url = not_none(self.canonicalize(url), "Not a recognized Vimeo URL")
         return ydl_download_media(url, target_dir, media_types)

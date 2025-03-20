@@ -4,7 +4,6 @@ import platform
 from datetime import datetime
 from logging import ERROR
 from textwrap import dedent
-from typing import Optional
 
 from strif import atomic_output_file
 
@@ -54,7 +53,7 @@ def weasyprint_setup() -> None:
 def html_to_pdf(
     html_content: str,
     output_file_path: str,
-    title: Optional[str] = None,
+    title: str | None = None,
 ) -> None:
     """
     Converts an HTML doc to a nicely formatted PDF file.
