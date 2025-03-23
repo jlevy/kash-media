@@ -16,8 +16,7 @@ requires-python = ">=3.11,<4.0"
 dynamic = ["version"]
 
 dependencies = [
-    # "kash-shell @ git+ssh://git@github.com/jlevy/kash-shell.git@main",
-    "kash-shell>=0.3.0",
+    "kash-shell",
     "typing-extensions>=4.11.1",
     # For printing. Note weasyprint has install dep issues on macos depending on the python version.
     # https://github.com/Kozea/WeasyPrint/issues/2112
@@ -41,10 +40,11 @@ dev = [
     "funlog>=0.2.0",
 ]
 
-[project.scripts]
 
-# Add script entry points here.
-kash-media = "kash:main"
+[project.scripts]
+# These override the kash-shell entry points so we have full deps for this kit.
+kash = "kash.shell_main:main"
+kash_mcp = "kash.mcp.kash_mcp_cli:main"
 
 
 # ---- Build system ----
