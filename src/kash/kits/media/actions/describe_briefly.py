@@ -1,5 +1,6 @@
 from kash.exec import kash_action, llm_transform_item
-from kash.model import Item, LLMOptions, Message, MessageTemplate, TitleTemplate
+from kash.llm_utils import Message, MessageTemplate
+from kash.model import Item, LLMOptions, TitleTemplate
 
 llm_options = LLMOptions(
     system_message=Message(

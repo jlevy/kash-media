@@ -5,10 +5,11 @@ from kash.errors import ApiResultError, InvalidInput
 from kash.exec import kash_action
 from kash.exec.preconditions import has_html_body, has_text_body
 from kash.kits.media.libs.speaker_labels import find_speaker_labels
+from kash.llm_utils import LLM, Message, MessageTemplate
 from kash.llm_utils.fuzzy_parsing import fuzzy_parse_json
 from kash.llm_utils.llm_completion import llm_template_completion
 from kash.media_base.timestamp_citations import html_speaker_id_span
-from kash.model import LLM, Item, ItemType, Message, MessageTemplate
+from kash.model import Item, ItemType
 from kash.utils.common.string_replace import replace_multiple
 
 log = get_logger(__name__)

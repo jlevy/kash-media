@@ -1033,6 +1033,7 @@ wheels = [
 name = "kash-media"
 source = { editable = "." }
 dependencies = [
+    { name = "chopdiff" },
     { name = "curl-cffi" },
     { name = "kash-shell" },
     { name = "opencv-python" },
@@ -1054,8 +1055,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "chopdiff", specifier = ">=0.1.3" },
     { name = "curl-cffi", specifier = ">=0.7.4" },
-    { name = "kash-shell" },
+    { name = "kash-shell", specifier = ">=0.3.3" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
     { name = "scikit-image", specifier = ">=0.25.2" },
     { name = "typing-extensions", specifier = ">=4.11.1" },
@@ -1075,7 +1077,7 @@ dev = [
 
 [[package]]
 name = "kash-shell"
-version = "0.3.2"
+version = "0.3.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1119,7 +1121,6 @@ dependencies = [
     { name = "regex" },
     { name = "rich" },
     { name = "ripgrepy" },
-    { name = "scipy" },
     { name = "send2trash" },
     { name = "setproctitle" },
     { name = "strif" },
@@ -1131,9 +1132,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "xonsh" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/21/33/ac72dbf0da419743476fdeb1a91d27e8208ca45c69b06b3204f1d462d6e1/kash_shell-0.3.2.tar.gz", hash = "sha256:90fcc2e292bedacc172fcebaae71ecace9f2583339baef5d01443b9cbdb6ac25", size = 483876 }
+sdist = { url = "https://files.pythonhosted.org/packages/bc/22/531f92cdf1d888710405efb55014bda24f3e8f19b57d0fbe62b7291aa856/kash_shell-0.3.3.tar.gz", hash = "sha256:1b1d02d084f24401f569c00dae15fca299f697bcd5b7c0c1e4437fb4383c8470", size = 487944 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/36/b7/55be6130dbf74f7745e9ee067ddf06f26ac0244dde408937eaaf8dc14395/kash_shell-0.3.2-py3-none-any.whl", hash = "sha256:c90b204e1cd33e39b80e6592ec548452fea81cc64e68c2e1ab2e87a88a97b515", size = 453479 },
+    { url = "https://files.pythonhosted.org/packages/6b/2b/7d49be70ba9aa831d0ea78d1225338ce9e562b328ae439b4bef94f5f21e0/kash_shell-0.3.3-py3-none-any.whl", hash = "sha256:6f71c1e74a6ca331aa82616d49d300c8307d00df81c6cbed15f81188b339181b", size = 459427 },
 ]
 
 [[package]]

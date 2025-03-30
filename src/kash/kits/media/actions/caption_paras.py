@@ -5,7 +5,8 @@ from kash.config.logger import get_logger
 from kash.errors import InvalidInput
 from kash.exec import kash_action, kash_precondition
 from kash.exec.llm_transforms import llm_transform_str
-from kash.model import Format, Item, ItemType, LLMOptions, Message, MessageTemplate
+from kash.llm_utils import Message, MessageTemplate
+from kash.model import Format, Item, ItemType, LLMOptions
 from kash.utils.common.task_stack import task_stack
 
 log = get_logger(__name__)

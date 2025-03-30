@@ -2,7 +2,8 @@ from chopdiff.transforms import WINDOW_128_PARA, adds_headings
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action, llm_transform_item
-from kash.model import LLM, Item, LLMOptions, Message, MessageTemplate
+from kash.llm_utils import LLM, Message, MessageTemplate
+from kash.model import Item, LLMOptions
 
 log = get_logger(__name__)
 

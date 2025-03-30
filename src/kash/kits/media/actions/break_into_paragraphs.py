@@ -3,7 +3,8 @@ from chopdiff.transforms import WINDOW_2K_WORDTOKS, changes_whitespace
 
 from kash.config.logger import get_logger
 from kash.exec import SkipItem, kash_action, llm_transform_item
-from kash.model import LLM, Item, LLMOptions, Message, MessageTemplate, Param
+from kash.llm_utils import LLM, Message, MessageTemplate
+from kash.model import Item, LLMOptions, Param
 
 log = get_logger(__name__)
 
