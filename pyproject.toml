@@ -23,7 +23,7 @@ dependencies = [
     # https://github.com/Kozea/WeasyPrint/issues/1448
     "weasyprint>=63.1",
     # For downloading media:
-    "yt-dlp>=2025.2.19",
+    "yt-dlp>=2025.3.27",
     "curl-cffi>=0.7.4",
     # For screen capture and image processing:
     "opencv-python>=4.11.0.86",
