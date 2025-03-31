@@ -1,7 +1,6 @@
 import json
 
 from kash.config.logger import get_logger
-from kash.errors import ApiResultError, InvalidInput
 from kash.exec import kash_action
 from kash.exec.preconditions import has_html_body, has_text_body
 from kash.kits.media.libs.speaker_labels import find_speaker_labels
@@ -11,6 +10,8 @@ from kash.llm_utils.llm_completion import llm_template_completion
 from kash.media_base.timestamp_citations import html_speaker_id_span
 from kash.model import Item, ItemType
 from kash.utils.common.string_replace import replace_multiple
+from kash.utils.common.string_template import StringTemplate
+from kash.utils.errors import ApiResultError, InvalidInput
 
 log = get_logger(__name__)
 
@@ -33,24 +34,35 @@ def identify_speakers(item: Item) -> Item:
 
     # Prepare the system message and template for LLM.
     system_message = Message("You are an assistant that identifies speakers in transcripts.")
-    identification_template = MessageTemplate(
+    message_template = StringTemplate(
         """
         The transcript below includes speakers identified by IDs like 'SPEAKER 0' or 'SPEAKER 1'.
-        Based on the transcript, provide a mapping from speaker IDs to actual speaker names.
+        Based on the info below and the transcript, provide a mapping from speaker IDs to
+        actual speaker names.
+
         The mapping should be in JSON format like {{"0": "Alice", "1": "Bob"}}.
         If you are not sure from the content, leave the names as is, writing something like
         {{"0": "Alice", "1": "SPEAKER 1"}} or {{"0": "SPEAKER 0", "1": "SPEAKER 1"}}.
+
+        First, here is the available info on the original recording or video:
+
+        Title: {title}
+        Description: {description}
+
         Transcript:
-        {body}
-        """
+
+        """,
+        allowed_fields=["title", "description"],
     )
+
+    message = message_template.format(title=item.title, description=item.description)
 
     # Perform LLM completion to get the speaker mapping.
     mapping_str = llm_template_completion(
         model=LLM.gpt_4o_mini,
         system_message=system_message,
         input=item.body,
-        body_template=identification_template,
+        body_template=MessageTemplate(message + "\n\n" + "{body}"),
     ).content
 
     # Parse the mapping.

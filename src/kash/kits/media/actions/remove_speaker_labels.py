@@ -1,11 +1,11 @@
 from chopdiff.html import html_find_tag
 
 from kash.config.logger import get_logger
-from kash.errors import InvalidInput
 from kash.exec import kash_action
 from kash.exec.preconditions import has_html_body, has_text_body
 from kash.model import Item, ItemType
 from kash.utils.common.string_replace import replace_multiple
+from kash.utils.errors import InvalidInput
 
 log = get_logger(__name__)
 

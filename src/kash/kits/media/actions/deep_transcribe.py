@@ -6,22 +6,25 @@ from kash.kits.media.actions.add_summary_bullets import add_summary_bullets
 from kash.kits.media.actions.caption_paras import caption_paras
 from kash.kits.media.actions.insert_frame_captures import insert_frame_captures
 from kash.kits.media.actions.insert_section_headings import insert_section_headings
-from kash.kits.media.actions.transcribe_format import transcribe_format
-from kash.model import Item
+from kash.kits.media.actions.transcribe_format import transcribe_and_format
+from kash.model import Item, common_params
 
 log = get_logger(__name__)
 
 
 @kash_action(
     precondition=is_url_item | is_audio_resource | is_video_resource,
+    params=common_params("language"),
     mcp_tool=True,
 )
-def transcribe_annotate_summarize(item: Item) -> Item:
+def deep_transcribe(item: Item, language: str = "en") -> Item:
     """
-    A fancy action to transcribe a video, format the transcript into paragraphs,
-    backfill timestamps, and add a summary and description.
+    Take a video or audio URL (such as YouTube), download and cache it, and
+    perform a "deep transcription" of it, including, full transcription,
+    identifying speakers, adding sections, timestamps, and annotations,
+    and inserting frame captures.
     """
-    formatted = transcribe_format(item)
+    formatted = transcribe_and_format(item, language=language)
 
     with_headings = insert_section_headings(formatted)
 

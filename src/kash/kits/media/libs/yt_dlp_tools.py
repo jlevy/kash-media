@@ -8,8 +8,8 @@ import yt_dlp
 from frontmatter_format import to_yaml_string
 
 from kash.config.logger import get_logger
-from kash.errors import ApiResultError
 from kash.utils.common.url import Url
+from kash.utils.errors import ApiResultError
 from kash.utils.file_utils.file_formats_model import MediaType
 
 log = get_logger(__name__)

@@ -16,9 +16,14 @@ requires-python = ">=3.11,<4.0"
 dynamic = ["version"]
 
 dependencies = [
+    # Main kash and media deps:
     "kash-shell>=0.3.3",
-    "chopdiff>=0.1.3",
+    # Utilities:
+    "rich>=14.0.0",
+    "rich-argparse>=1.7.0",
     "typing-extensions>=4.11.1",
+    # Content tools:
+    "chopdiff>=0.1.3",
     # For printing. Note weasyprint has install dep issues on macos depending on the python version.
     # https://github.com/Kozea/WeasyPrint/issues/2112
     # https://github.com/Kozea/WeasyPrint/issues/1448
@@ -36,7 +41,7 @@ dev = [
     "pytest>=8.3.5",
     "ruff>=0.11.0",
     "codespell>=2.4.1",
-    "rich>=13.9.4",
+    "rich>=14.0.0",
     "basedpyright>=1.28.2",
     "funlog>=0.2.0",
 ]

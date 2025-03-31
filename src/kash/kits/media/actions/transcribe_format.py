@@ -17,10 +17,10 @@ log = get_logger(__name__)
     params=common_params("language"),
     mcp_tool=True,
 )
-def transcribe_format(item: Item, language: str = "en") -> Item:
+def transcribe_and_format(item: Item, language: str = "en") -> Item:
     """
-    Transcribe a video, format the transcript into paragraphs, and backfill the source
-    timestamps on each paragraph.
+    Perform basic transcription with diarization, breaking into paragraphs,
+    and adding timestamps. Will attempt to identify speakers from the transcript.
     """
     transcribed_item = transcribe(item, language=language)
 

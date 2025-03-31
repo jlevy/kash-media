@@ -14,13 +14,13 @@ from chopdiff.docs import (
 from chopdiff.html import ContentNotFound, TimestampExtractor
 
 from kash.config.logger import get_logger
-from kash.errors import InvalidInput, UnexpectedError
 from kash.exec import kash_action
 from kash.exec.preconditions import has_timestamps, is_text_doc
 from kash.media_base.timestamp_citations import add_citation_to_text, format_timestamp_citation
 from kash.model import Format, Item, ItemType, common_params
 from kash.utils.common.format_utils import fmt_loc
 from kash.utils.common.type_utils import not_none
+from kash.utils.errors import InvalidInput, UnexpectedError
 from kash.workspaces.source_items import find_upstream_item, find_upstream_resource
 
 log = get_logger(__name__)

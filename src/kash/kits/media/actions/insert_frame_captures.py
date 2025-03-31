@@ -4,7 +4,6 @@ from chopdiff.html import TimestampExtractor
 from chopdiff.html.html_in_md import html_img, md_para
 
 from kash.config.logger import get_logger
-from kash.errors import ContentError, InvalidInput
 from kash.exec import kash_action, kash_precondition
 from kash.exec.preconditions import has_timestamps, is_text_doc
 from kash.kits.media.libs.image_similarity import filter_similar_frames
@@ -13,6 +12,7 @@ from kash.model import Format, Item, ItemType, Param
 from kash.utils.common.format_utils import fmt_loc
 from kash.utils.common.string_replace import Insertion, insert_multiple
 from kash.utils.common.url import as_file_url
+from kash.utils.errors import ContentError, InvalidInput
 from kash.utils.file_utils.file_formats_model import MediaType
 from kash.web_content.file_cache_utils import cache_file, cache_resource
 from kash.workspaces import current_ws

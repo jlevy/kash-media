@@ -1,9 +1,9 @@
 from kash.config.logger import get_logger
-from kash.errors import InvalidInput
 from kash.exec import kash_action
 from kash.exec.preconditions import is_url_item
 from kash.media_base.media_services import canonicalize_media_url, list_channel_items
 from kash.model import NO_ARGS, ActionInput, ActionResult, Item
+from kash.utils.errors import InvalidInput
 
 log = get_logger(__name__)
 

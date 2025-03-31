@@ -25,7 +25,9 @@ llm_options = LLMOptions(
           say "The author says cheese is nutritious" or "According to the text, cheese is nutritious."
 
         - If the content is missing so brief that it can't be described, simply say "(No description.)"
-        
+
+        - If the input is in a language other than English, output the description in the same language.
+
         Original text:
 
         {body}

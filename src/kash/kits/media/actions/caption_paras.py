@@ -2,12 +2,12 @@ from chopdiff.divs import div
 from chopdiff.docs import Paragraph, TextDoc, TextUnit
 
 from kash.config.logger import get_logger
-from kash.errors import InvalidInput
 from kash.exec import kash_action, kash_precondition
 from kash.exec.llm_transforms import llm_transform_str
 from kash.llm_utils import Message, MessageTemplate
 from kash.model import Format, Item, ItemType, LLMOptions
 from kash.utils.common.task_stack import task_stack
+from kash.utils.errors import InvalidInput
 
 log = get_logger(__name__)
 
@@ -40,6 +40,8 @@ llm_options = LLMOptions(
 
         - If the input is very short or so unclear you can't summarize it, simply output
             "(No results)".
+
+        - If the input is in a language other than English, output the caption in the same language.
 
         Sample input text:
 

@@ -41,6 +41,8 @@ llm_options = LLMOptions(
 
         - If the input is very short or unclear, output the text exactly, without adding any headings.
 
+        - If the input is in a language other than English, output the text in the same language.
+
         Input text:
 
         {body}
