@@ -1,4 +1,5 @@
 import json
+from textwrap import dedent
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action
@@ -40,9 +41,10 @@ def identify_speakers(item: Item) -> Item:
         Based on the info below and the transcript, provide a mapping from speaker IDs to
         actual speaker names.
 
-        The mapping should be in JSON format like {{"0": "Alice", "1": "Bob"}}.
-        If you are not sure from the content, leave the names as is, writing something like
-        {{"0": "Alice", "1": "SPEAKER 1"}} or {{"0": "SPEAKER 0", "1": "SPEAKER 1"}}.
+        The mapping should be in JSON format.
+        If you are not sure from the content, leave the names as is and only fill in the
+        known names. Examples:
+        {json_examples}
 
         First, here is the available info on the original recording or video:
 
@@ -52,10 +54,22 @@ def identify_speakers(item: Item) -> Item:
         Transcript:
 
         """,
-        allowed_fields=["title", "description"],
+        allowed_fields=["title", "description", "json_examples"],
     )
 
-    message = message_template.format(title=item.title, description=item.description)
+    json_examples = dedent(
+        """
+        Example 1: {{"0": "Alice", "1": "Bob"}}
+
+        Example 2: {{"0": "Alice", "1": "SPEAKER 1"}}
+
+        Example 3: {{"0": "SPEAKER 0", "1": "SPEAKER 1"}}
+        """
+    )
+
+    message = message_template.format(
+        title=item.title, description=item.description, json_examples=json_examples
+    )
 
     # Perform LLM completion to get the speaker mapping.
     mapping_str = llm_template_completion(
