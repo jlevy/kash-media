@@ -53,7 +53,7 @@ dev = [
 
 [project.scripts]
 # These override the kash-shell entry points so we have full deps for this kit.
-kash = "kash.shell_main:main"
+kash = "kash.shell.shell_main:main"
 kash_mcp = "kash.mcp.kash_mcp_cli:main"
 
 
