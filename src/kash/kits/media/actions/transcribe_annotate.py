@@ -6,7 +6,7 @@ from kash.kits.media.actions.add_summary_bullets import add_summary_bullets
 from kash.kits.media.actions.caption_paras import caption_paras
 from kash.kits.media.actions.insert_frame_captures import insert_frame_captures
 from kash.kits.media.actions.insert_section_headings import insert_section_headings
-from kash.kits.media.actions.transcribe_and_format import transcribe_and_format
+from kash.kits.media.actions.transcribe_format import transcribe_format
 from kash.model import Item, common_params
 
 log = get_logger(__name__)
@@ -17,13 +17,13 @@ log = get_logger(__name__)
     params=common_params("language"),
     mcp_tool=True,
 )
-def transcribe_and_annotate(item: Item, language: str = "en") -> Item:
+def transcribe_annotate(item: Item, language: str = "en") -> Item:
     """
-    Do everything `transcribe_and_format` does plus adding sections,
+    Do everything `transcribe_format` does plus adding sections,
     paragraph annotations, frame captures (avoiding duplicative frames),
     a bulleted summary, and a description at the top.
     """
-    formatted = transcribe_and_format(item, language=language)
+    formatted = transcribe_format(item, language=language)
 
     with_headings = insert_section_headings(formatted)
 

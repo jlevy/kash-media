@@ -14,7 +14,6 @@ log = get_logger(__name__)
 
 
 @kash_action(
-    name="transcribe",
     precondition=is_url_item | is_audio_resource | is_video_resource,
     params=common_params("language"),
     mcp_tool=True,

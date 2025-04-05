@@ -17,7 +17,7 @@ log = get_logger(__name__)
     params=common_params("language"),
     mcp_tool=True,
 )
-def transcribe_and_format(item: Item, language: str = "en") -> Item:
+def transcribe_format(item: Item, language: str = "en") -> Item:
     """
     Same as `transcribe` plus attempt to
     identify the speakers, break text into paragraphs and if possible adding
