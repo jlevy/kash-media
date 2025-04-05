@@ -17,7 +17,7 @@ dynamic = ["version"]
 
 dependencies = [
     # Main kash and media deps:
-    "kash-shell>=0.3.6",
+    "kash-shell>=0.3.7",
     # Utilities:
     "rich>=14.0.0",
     "rich-argparse>=1.7.0",
@@ -54,7 +54,7 @@ dev = [
 [project.scripts]
 # These override the kash-shell entry points so we have full deps for this kit.
 kash = "kash.shell.shell_main:main"
-kash_mcp = "kash.mcp.kash_mcp_cli:main"
+kash_mcp = "kash.mcp.mcp_cli:main"
 
 
 # ---- Build system ----

@@ -19,8 +19,9 @@ log = get_logger(__name__)
 )
 def transcribe_and_format(item: Item, language: str = "en") -> Item:
     """
-    Perform basic transcription with diarization, breaking into paragraphs,
-    and adding timestamps. Will attempt to identify speakers from the transcript.
+    Same as `transcribe` plus attempt to
+    identify the speakers, break text into paragraphs and if possible adding
+    timestamps with links per paragraph.
     """
     transcribed_item = transcribe(item, language=language)
 

@@ -21,7 +21,9 @@ log = get_logger(__name__)
 )
 def transcribe(item: Item, language: str = "en") -> Item:
     """
-    Download and transcribe audio from a podcast or video.
+    Download and transcribe audio from a podcast or video and return raw text,
+    including timestamps if available (as HTML `<span>` tags), also caching
+    video, audio, and transcript as local files.
     """
 
     if item.url:

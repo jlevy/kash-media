@@ -1059,7 +1059,7 @@ dev = [
 requires-dist = [
     { name = "chopdiff", specifier = ">=0.1.3" },
     { name = "curl-cffi", specifier = ">=0.7.4" },
-    { name = "kash-shell", specifier = ">=0.3.6" },
+    { name = "kash-shell", specifier = ">=0.3.7" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
     { name = "rich", specifier = ">=14.0.0" },
     { name = "rich-argparse", specifier = ">=1.7.0" },
@@ -1081,7 +1081,7 @@ dev = [
 
 [[package]]
 name = "kash-shell"
-version = "0.3.6"
+version = "0.3.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -1136,9 +1136,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "xonsh" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2a/03/871ea352132ba9e4534b580265a38547a28bc7e20eb3f841ea146c08ec06/kash_shell-0.3.6.tar.gz", hash = "sha256:f086d505b8105cbc7651159348f190a69327f80a815aa2496ad53487b54390e0", size = 490997 }
+sdist = { url = "https://files.pythonhosted.org/packages/95/9a/5a34efabac1d50610bca81b26c49abcf567398c001c63471a99dad402254/kash_shell-0.3.7.tar.gz", hash = "sha256:6945f550fc506bd36d49c9449937fe0ee772e482adec7a7fa0119a98eae68f74", size = 491012 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f2/dd/8935322573cb732d254af24367cdff997b55d984adf6070b44439e149f1e/kash_shell-0.3.6-py3-none-any.whl", hash = "sha256:b51b3d56ba220d471a005c3ee42a9e25d18e527aa4a4a7340d46f76b9e4527bf", size = 462612 },
+    { url = "https://files.pythonhosted.org/packages/c2/ea/fc4070151359118f1076a5fcd041d230797cfe0b82f2f5edf749e101dac3/kash_shell-0.3.7-py3-none-any.whl", hash = "sha256:dc5c45b357774cc6674adbea46ea076bf3268300360c89067b3ba869c8f297fc", size = 462643 },
 ]
 
 [[package]]
@@ -1284,11 +1284,11 @@ wheels = [
 
 [[package]]
 name = "marko"
-version = "2.1.2"
+version = "2.1.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8c/38/6ea5d8600b94432656c669816a479580d9f1c49ef6b426282f4ba261ae9b/marko-2.1.2.tar.gz", hash = "sha256:a9170006b879376e6845c91b1ae3dce2992772954b99b70175ff888537186011", size = 142593 }
+sdist = { url = "https://files.pythonhosted.org/packages/f2/e7/b50627a7321668d0c30b193aa494fb59526548ff3e61d376a93ffbb692f0/marko-2.1.3.tar.gz", hash = "sha256:31aacb14867328f054cc39f884212907822a43d6a30cd75b0767e001a5e2f9fc", size = 142700 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ef/9b/3dbfbe6ee255b1c37a37e2a6046adb2e77763a020591dae63e5005a2c8d7/marko-2.1.2-py3-none-any.whl", hash = "sha256:c14aa7a77468aaaf53cf056dcd3d32398b9df4c3fb81f5e120dd37cbb9f8c859", size = 42089 },
+    { url = "https://files.pythonhosted.org/packages/fc/43/c82e8f528887cec56f5afa9152c921b01f98deeffaf9e1bcc3e54e90c291/marko-2.1.3-py3-none-any.whl", hash = "sha256:b4125d44b94606d6f13ddc77fef8cc4c87f70d54bc7d52d6547958b9f998a9d5", size = 42187 },
 ]
 
 [[package]]
