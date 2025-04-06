@@ -17,7 +17,7 @@ dynamic = ["version"]
 
 dependencies = [
     # Main kash and media deps:
-    "kash-shell>=0.3.7",
+    "kash-shell>=0.3.8",
     # Utilities:
     "rich>=14.0.0",
     "rich-argparse>=1.7.0",
