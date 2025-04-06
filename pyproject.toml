@@ -3,6 +3,7 @@
 [project.urls]
 Repository = "https://github.com/jlevy/kash-media"
 # Homepage = "https://..."
+# Documentation = "https://..."
 
 [project]
 name = "kash-media"
@@ -14,6 +15,9 @@ readme = "README.md"
 license = "AGPL-3.0-or-later"
 requires-python = ">=3.11,<4.0"
 dynamic = ["version"]
+
+
+# ---- Main dependencies ----
 
 dependencies = [
     # Main kash and media deps:
