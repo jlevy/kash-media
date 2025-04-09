@@ -7,13 +7,12 @@ from textwrap import dedent
 
 from strif import atomic_output_file
 
-from kash.config.logger import get_logger
 from kash.config.settings import APP_NAME
 from kash.kits.media.libs import media_templates_dir
 from kash.web_gen import base_templates_dir as common_templates_dir
 from kash.web_gen.template_render import render_web_template
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 def weasyprint_setup() -> None:
@@ -21,10 +20,10 @@ def weasyprint_setup() -> None:
     if is_macos:
         dylib = os.getenv("DYLD_LIBRARY_PATH")
         homebrew_lib = "/opt/homebrew/lib"
-
+        # Manually append to DYLD_LIBRARY_PATH.
         new_dylib = f"{dylib}:{homebrew_lib}" if dylib else homebrew_lib
-        print("Setting DYLD_LIBRARY_PATH to: %s", new_dylib)
-        # os.environ["DYLD_LIBRARY_PATH"] = new_dylib
+        # print("Setting DYLD_LIBRARY_PATH to: %s", new_dylib)
+        os.environ["DYLD_LIBRARY_PATH"] = new_dylib
 
     try:
         import weasyprint  # noqa: F401
@@ -32,12 +31,13 @@ def weasyprint_setup() -> None:
         if is_macos:
             log.exception(
                 dedent(
-                    """Failed to import weasyprint. Installing with `brew` may help. See:
+                    """Failed to import weasyprint. Installing it with `brew` may help. See:
                     https://github.com/Kozea/WeasyPrint/issues/1448
                     https://github.com/astral-sh/uv/issues/6971
                     """
                 )
             )
+        raise
 
     # Reduce weasyprint noisiness.
     log_levels = {
