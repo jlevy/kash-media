@@ -11,6 +11,8 @@ from kash.config.logger import get_logger
 from kash.utils.common.url import Url
 from kash.utils.errors import ApiResultError
 from kash.utils.file_utils.file_formats_model import MediaType
+from kash.shell.clideps.pkg_deps import Pkg, pkg_check
+
 
 log = get_logger(__name__)
 
@@ -48,6 +50,7 @@ def ydl_download_media(
     Download and convert to mp3 and mp4 using yt_dlp, which is generally the best
     library for this.
     """
+    pkg_check().require(Pkg.ffmpeg)
 
     if not media_types:
         media_types = [MediaType.audio, MediaType.video]

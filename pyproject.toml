@@ -52,7 +52,7 @@ dev = [
 
 [tool.uv.sources]
 # For bleeding edge:
-# kash-shell = { git = "https://github.com/jlevy/kash-shell.git" }
+kash-shell = { git = "https://github.com/jlevy/kash-shell.git" }
 # For local development:
 # kash-shell = { path = "../kash", editable = true }
 
@@ -60,7 +60,7 @@ dev = [
 [project.scripts]
 # These override the kash-shell entry points so we have full deps for this kit.
 kash = "kash.shell.shell_main:main"
-kash_mcp = "kash.mcp.mcp_cli:main"
+kash-mcp = "kash.mcp.mcp_cli:main"
 
 
 # ---- Build system ----
