@@ -48,6 +48,7 @@ dev = [
     "rich>=14.0.0",
     "basedpyright>=1.28.2",
     "funlog>=0.2.0",
+    "clideps>=0.1.1",
 ]
 
 [tool.uv.sources]
@@ -59,6 +60,9 @@ dev = [
 
 [project.scripts]
 # These override the kash-shell entry points so we have full deps for this kit.
+# kash-media should match the package name so it's easy to run from uvx.
+# kash makes it easy to run as usual with kash.
+kash-media = "kash.shell.shell_main:main"
 kash = "kash.shell.shell_main:main"
 kash-mcp = "kash.mcp.mcp_cli:main"
 

@@ -5,14 +5,14 @@ from pathlib import Path
 from typing import Any
 
 import yt_dlp
+from clideps.pkgs.pkg_check import pkg_check
+from clideps.pkgs.pkg_types import Platform
 from frontmatter_format import to_yaml_string
 
 from kash.config.logger import get_logger
 from kash.utils.common.url import Url
 from kash.utils.errors import ApiResultError
 from kash.utils.file_utils.file_formats_model import MediaType
-from kash.shell.clideps.pkg_deps import Pkg, pkg_check
-
 
 log = get_logger(__name__)
 
@@ -50,7 +50,10 @@ def ydl_download_media(
     Download and convert to mp3 and mp4 using yt_dlp, which is generally the best
     library for this.
     """
-    pkg_check().require(Pkg.ffmpeg)
+    # We need ffmpeg CLI. On Linux we also need libgl1 (has several names but clideps
+    # knows about it).
+    pkg_check().require("ffmpeg")
+    pkg_check().require("libgl1", on_platforms=[Platform.Linux])
 
     if not media_types:
         media_types = [MediaType.audio, MediaType.video]
