@@ -1,6 +1,8 @@
 import json
 from textwrap import dedent
 
+from strif import StringTemplate, replace_multiple
+
 from kash.config.logger import get_logger
 from kash.exec import kash_action
 from kash.exec.preconditions import has_html_body, has_text_body
@@ -10,8 +12,6 @@ from kash.llm_utils.fuzzy_parsing import fuzzy_parse_json
 from kash.llm_utils.llm_completion import llm_template_completion
 from kash.media_base.timestamp_citations import html_speaker_id_span
 from kash.model import Item, ItemType
-from kash.utils.common.string_replace import replace_multiple
-from kash.utils.common.string_template import StringTemplate
 from kash.utils.errors import ApiResultError, InvalidInput
 
 log = get_logger(__name__)
