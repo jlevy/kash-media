@@ -2,6 +2,7 @@ from chopdiff.divs import parse_divs
 from chopdiff.docs import search_tokens
 from chopdiff.html import TimestampExtractor
 from chopdiff.html.html_in_md import html_img, md_para
+from strif import Insertion, insert_multiple
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action, kash_precondition
@@ -10,7 +11,6 @@ from kash.kits.media.libs.image_similarity import filter_similar_frames
 from kash.kits.media.libs.video_frames import capture_frames
 from kash.model import Format, Item, ItemType, Param
 from kash.utils.common.format_utils import fmt_loc
-from kash.utils.common.string_replace import Insertion, insert_multiple
 from kash.utils.common.url import as_file_url
 from kash.utils.errors import ContentError, InvalidInput
 from kash.utils.file_utils.file_formats_model import MediaType
