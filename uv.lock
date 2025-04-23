@@ -1111,11 +1111,15 @@ dependencies = [
     { name = "curl-cffi" },
     { name = "kash-shell" },
     { name = "opencv-python" },
+    { name = "requests" },
     { name = "rich" },
     { name = "rich-argparse" },
     { name = "scikit-image" },
+    { name = "tenacity" },
+    { name = "thefuzz" },
     { name = "typing-extensions" },
     { name = "weasyprint" },
+    { name = "wikipedia-api" },
     { name = "yt-dlp" },
 ]
 
@@ -1136,11 +1140,15 @@ requires-dist = [
     { name = "curl-cffi", specifier = ">=0.7.4" },
     { name = "kash-shell", git = "https://github.com/jlevy/kash-shell.git" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
+    { name = "requests", specifier = ">=2.32.3" },
     { name = "rich", specifier = ">=14.0.0" },
     { name = "rich-argparse", specifier = ">=1.7.0" },
     { name = "scikit-image", specifier = ">=0.25.2" },
+    { name = "tenacity", specifier = ">=9.1.2" },
+    { name = "thefuzz", specifier = ">=0.22.1" },
     { name = "typing-extensions", specifier = ">=4.11.1" },
     { name = "weasyprint", specifier = ">=63.1" },
+    { name = "wikipedia-api", specifier = ">=0.8.1" },
     { name = "yt-dlp", specifier = ">=2025.3.27" },
 ]
 
@@ -3027,6 +3035,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/1b/6c/c65773d6cab416a64d191d6ee8a8b1c68a09970ea6909d16965d26bfed1e/websockets-15.0.1-cp313-cp313-win_amd64.whl", hash = "sha256:e09473f095a819042ecb2ab9465aee615bd9c2028e4ef7d933600a8401c79561", size = 176837 },
     { url = "https://files.pythonhosted.org/packages/fa/a8/5b41e0da817d64113292ab1f8247140aac61cbf6cfd085d6a0fa77f4984f/websockets-15.0.1-py3-none-any.whl", hash = "sha256:f7a866fbc1e97b5c617ee4116daaa09b722101d4a3c170c787450ba409f9736f", size = 169743 },
 ]
+
+[[package]]
+name = "wikipedia-api"
+version = "0.8.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b9/aa/2e35be124dfc7e581480705f912040172f6570cc12e68a245ba9258c32ef/wikipedia_api-0.8.1.tar.gz", hash = "sha256:b31e93b3f5407c1a1ba413ed7326a05379a3c270df6cf6a211aca67a14c5658b", size = 19934 }
 
 [[package]]
 name = "xonsh"
