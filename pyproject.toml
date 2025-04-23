@@ -42,7 +42,7 @@ dependencies = [
     "requests>=2.32.3",
     "tenacity>=9.1.2",
     "thefuzz>=0.22.1",
-    "wikipedia-api>=0.8.1"
+    "wikipedia-api>=0.8.1",
 ]
 
 [dependency-groups]

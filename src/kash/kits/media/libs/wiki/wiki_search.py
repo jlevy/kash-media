@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from functools import cached_property
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
 
@@ -10,17 +11,63 @@ import requests
 import wikipediaapi
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 from thefuzz import fuzz
+from typing_extensions import override
 from wikipediaapi import Namespace, Wikipedia, WikipediaPage
 
 from kash.config.logger import get_logger
-from kash.utils.common.url import Url
-from kash.web_content.file_cache_utils import cache_api_response
+from kash.web_content.file_cache_utils import cache_file
+from kash.web_content.local_file_cache import Loadable
 
 log = get_logger(__name__)
 
+
+class CachingSession(requests.Session):
+    def __init__(self):
+        super().__init__()
+
+    @override
+    def get(self, url: str | bytes, **kwargs: Any) -> Any:
+        # Extract params for cache key generation if present
+        params = kwargs.get("params")
+        # We need a unique key for the cache, so we use the URL and params.
+        url_str = url.decode() if isinstance(url, bytes) else str(url)
+        query_string = urlencode(params or {})
+        url_key = f"{url_str}?{query_string}" if query_string else url_str
+
+        orig_session = super()
+
+        def save(path: Path):
+            response = orig_session.get(url, **kwargs)
+            response.raise_for_status()
+            response.raw.decode_content = True
+            with open(path, "wb") as f:
+                f.write(response.content)
+
+        path, was_cached = cache_file(Loadable(url_key, save))
+        if was_cached:
+            log.warning("Wikipedia API cache hit: %s", url_key)
+
+        # A simple hack to make sure response.json() works.
+        response = requests.Response()
+        response.status_code = 200
+        response.encoding = "utf-8"
+        response._content = path.read_bytes()
+        return response
+
+
 WIKI_LANGUAGE = "en"
 
-_wiki = wikipediaapi.Wikipedia(language=WIKI_LANGUAGE, user_agent=wikipediaapi.USER_AGENT)
+
+def get_wiki_api_base_url(language: str = WIKI_LANGUAGE) -> str:
+    return f"https://{language}.wikipedia.org/w/api.php"
+
+
+_wiki: Wikipedia = wikipediaapi.Wikipedia(
+    language=WIKI_LANGUAGE, user_agent=wikipediaapi.USER_AGENT
+)
+
+# Hot patch the session to use our caching session.
+_wiki._session = CachingSession()  # pyright: ignore[reportPrivateUsage]
 
 
 @dataclass(frozen=True)
@@ -115,20 +162,6 @@ def assemble_search_results(
     )
 
 
-def call_wiki_api(wiki: Wikipedia, params: dict[str, Any], timeout: float = 10) -> Any:
-    """
-    Call the MediaWiki API with the given base URL and parameters.
-    """
-
-    base_url = f"https://{wiki.language}.wikipedia.org/w/api.php"
-    log.info("Wikipedia search request: %s with params %r", base_url, params)
-    response = wiki._session.get(  # pyright: ignore[reportPrivateUsage]
-        base_url, params=params, timeout=timeout
-    )
-    response.raise_for_status()
-    return response.json()
-
-
 @retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(5))
 def wiki_article_search_api(
     concept: str, *, max_results: int = 5, timeout: float = 10
@@ -147,11 +180,12 @@ def wiki_article_search_api(
             "format": "json",
         }
 
-        base_url = f"https://{_wiki.language}.wikipedia.org/w/api.php"
-        url = Url(f"{base_url}?{urlencode(search_params)}")
-        search_data, was_cached = cache_api_response(url)
-        if was_cached:
-            log.message("Wikipedia search: cache hit for %r", concept)
+        # Use our own patched caching session.
+        response = _wiki._session.get(  # pyright: ignore[reportPrivateUsage]
+            get_wiki_api_base_url(), params=search_params, timeout=timeout
+        )
+        response.raise_for_status()
+        search_data = response.json()
 
         titles = [item["title"] for item in search_data.get("query", {}).get("search", [])]
         if not titles:
@@ -235,6 +269,8 @@ def calculate_notability_score(page: WikipediaPage) -> float:
 
     # Fetch properties; these might trigger API calls if not cached
     try:
+        # FIXME: wikipediaapi's backlinks() method has no limit to how many backlinks it will fetch!
+        # Should patch to limit to a few pages. Pages like "Paris" have thousands of backlinks.
         num_backlinks = len(page.backlinks)
         num_langlinks = len(page.langlinks)
         page_length = page.length or 0
