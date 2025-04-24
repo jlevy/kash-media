@@ -107,7 +107,7 @@ class WikiSearchResults:
         return bool(self.page_results)
 
 
-def assemble_search_results(
+def _assemble_search_results(
     concept: str,
     pages: list[WikipediaPage],
     min_notability_score: float = 4.0,
@@ -163,7 +163,7 @@ def assemble_search_results(
 
 
 @retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(5))
-def wiki_article_search_api(
+def wiki_article_search_raw(
     concept: str, *, max_results: int = 5, timeout: float = 10
 ) -> list[WikipediaPage]:
     """
@@ -229,8 +229,12 @@ def wiki_article_search_api(
 
 
 def wiki_article_search(concept: str) -> WikiSearchResults:
-    results = wiki_article_search_api(concept)
-    return assemble_search_results(concept, results)
+    """
+    Search Wikipedia for a concept and return results with additional scoring
+    and disambiguation checks.
+    """
+    results = wiki_article_search_raw(concept)
+    return _assemble_search_results(concept, results)
 
 
 def wiki_title_score(concept: str, page: WikipediaPage) -> float:

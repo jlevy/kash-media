@@ -11,6 +11,6 @@ def has_video_id(item: Item) -> bool:
 
 @kash_precondition
 def is_youtube_video(item: Item) -> bool:
-    from kash.kits.media.libs import youtube
+    from kash.kits.media.media_services import youtube
 
     return bool(item.url and youtube.canonicalize(item.url))

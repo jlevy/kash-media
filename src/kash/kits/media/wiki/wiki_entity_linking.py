@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from kash.config.logger import get_logger
-from kash.kits.media.libs.wiki.wiki_search import wiki_article_search
+from kash.kits.media.wiki.wiki_search import wiki_article_search
 from kash.text_handling.markdown_utils import find_markdown_text, markdown_link
 from kash.utils.common.url import Url
 
@@ -24,7 +24,7 @@ def link_wiki_entities(text: str, entity_strs: Sequence[str]) -> tuple[str, Enri
     Embed Wikipedia links for the first occurrence of each entity
     string in `text`.
 
-    The does a case‑insensitive search for each candidate entity in order,
+    The does a case-insensitive search for each candidate entity in order,
     skipping sections already part of a link. Then uses `wiki_article_search()`
     to find a Wikipedia page and embeds a link if it is found and unambiguous.
     """

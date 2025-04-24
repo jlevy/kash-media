@@ -43,6 +43,8 @@ dependencies = [
     "tenacity>=9.1.2",
     "thefuzz>=0.22.1",
     "wikipedia-api>=0.8.1",
+    "pandas>=2.2.3",
+    "simplemma>=1.1.2",
 ]
 
 [dependency-groups]
@@ -181,6 +183,7 @@ reportExplicitAny = false
 reportUnknownMemberType = false
 reportUnknownVariableType = false
 reportUnknownArgumentType = false
+reportUntypedFunctionDecorator = false
 
 [tool.codespell]
 ignore-words-list = "iTerm,Numbe,caf"
