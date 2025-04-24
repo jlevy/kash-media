@@ -15,6 +15,7 @@ log = get_logger(__name__)
 # Originally adapted from:
 # https://cookbook.openai.com/examples/named_entity_recognition_to_enrich_text
 
+labels_str = "\n".join(str(label) for label in CONCEPT_LABELS)
 
 llm_options = LLMOptions(
     model=LLM.default_standard,
@@ -32,7 +33,7 @@ llm_options = LLMOptions(
         If no entities are found, return the string: "(No results)"
 
         Each item should be labeled for clarity and to disambiguate it:
-        {"\n".join(str(label) for label in CONCEPT_LABELS)}.
+        {labels_str}.
         """
     ),
     body_template=MessageTemplate(
