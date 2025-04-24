@@ -398,7 +398,7 @@ wheels = [
 
 [[package]]
 name = "chopdiff"
-version = "0.2.0"
+version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cydifflib" },
@@ -409,9 +409,9 @@ dependencies = [
     { name = "strif" },
     { name = "tiktoken" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ef/6b/b6430677ef97c3824aee254c386604cf51e21052b3a6f2353bebd38525e0/chopdiff-0.2.0.tar.gz", hash = "sha256:a0aed6f47388752261dd2c327b1e55b03c17409e026365e716d6e9d0a2996428", size = 76259 }
+sdist = { url = "https://files.pythonhosted.org/packages/1e/e1/76a6e71976c2f8c07426340d7dfaed562d1e36469819aff58f848a20a267/chopdiff-0.2.1.tar.gz", hash = "sha256:5d0e85f70e229f96dc98bfcdafdb63a88a9d7ead8f756b954f31c7bb8b2ad27c", size = 76258 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2b/0d/1c0e2b944723f5587765474cd4108ff69ccf459b2629b2be6a4c774e341e/chopdiff-0.2.0-py3-none-any.whl", hash = "sha256:20a4126e705ae02e4d30a45b2b5b8d405aa6517f02cd2ada7bec36d7e632572b", size = 42788 },
+    { url = "https://files.pythonhosted.org/packages/a3/5a/37bbed5abd16822ad802c006d40dd3fe6019076de7892d262002ff514582/chopdiff-0.2.1-py3-none-any.whl", hash = "sha256:5b65d4188a5a11dcc4968bf804e6ce06f1dabe42c658aed607f40b588dbefd3c", size = 42786 },
 ]
 
 [[package]]
@@ -1168,8 +1168,8 @@ dev = [
 
 [[package]]
 name = "kash-shell"
-version = "0.3.10.dev19+5f08873"
-source = { git = "https://github.com/jlevy/kash-shell.git#5f0887330e6cf04956f50f0a323df44292a02b63" }
+version = "0.3.10.dev22+c60aa32"
+source = { git = "https://github.com/jlevy/kash-shell.git#c60aa322fcde8403c045e1bd9a5cc702990e68a9" }
 dependencies = [
     { name = "anyio" },
     { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
@@ -1244,7 +1244,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/b3/15/c9f68c4f477fbaa9f
 
 [[package]]
 name = "litellm"
-version = "1.67.1"
+version = "1.67.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1259,9 +1259,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "tokenizers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/54/a4/bb3e9ae59e5a9857443448de7c04752630dc84cddcbd8cee037c0976f44f/litellm-1.67.1.tar.gz", hash = "sha256:78eab1bd3d759ec13aa4a05864356a4a4725634e78501db609d451bf72150ee7", size = 7242044 }
+sdist = { url = "https://files.pythonhosted.org/packages/a7/61/b974067af7908f19a0391ebda0ebfdff376eb9314c28578a9e60b0b381a7/litellm-1.67.2.tar.gz", hash = "sha256:9e108827bff16af04fd4c35b0c1a1d6c7746c96db3870189a60141d449797487", size = 7257152 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/88/86/c14d3c24ae13c08296d068e6f79fd4bd17a0a07bddbda94990b87c35d20e/litellm-1.67.1-py3-none-any.whl", hash = "sha256:8fff5b2a16b63bb594b94d6c071ad0f27d3d8cd4348bd5acea2fd40c8e0c11e8", size = 7607266 },
+    { url = "https://files.pythonhosted.org/packages/c2/7f/1a7750bf49ff096ec8d924059a1daea7d98dc065a13294a849178a678c02/litellm-1.67.2-py3-none-any.whl", hash = "sha256:32df4d17b3ead17d04793311858965e41e83a7bdf9bd661895c0e6bc9c78dc8b", size = 7626920 },
 ]
 
 [[package]]

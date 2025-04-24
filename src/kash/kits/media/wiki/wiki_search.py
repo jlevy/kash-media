@@ -115,7 +115,7 @@ def _assemble_search_results(
     unambiguous_threshold: float = 6.0,
     unambiguous_cutoff: float = 2,
 ) -> WikiSearchResults:
-    results = []
+    results: list[WikiPageResult] = []
 
     # Assemble results, excluding any disambiguation pages.
     disambiguation_page = None
@@ -146,8 +146,10 @@ def _assemble_search_results(
             max_score = sorted_results[0].total_score
             second_score = sorted_results[1].total_score
             log.info(
-                "Top two scores: %s, %s",
+                "Top two scores: %s (%s), %s (%s)",
+                sorted_results[0].page.title,
                 sorted_results[0].score_str(),
+                sorted_results[1].page.title,
                 sorted_results[1].score_str(),
             )
             is_unambiguous = (

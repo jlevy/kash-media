@@ -51,7 +51,10 @@ def find_near_duplicates(input: ActionInput) -> ActionResult:
     print_h3("Near Duplicates")
     cprint(f"Most-related items (score >= {report_threshold}):")
     PrintHooks.spacer()
-    cprint("%s", report)
+    if report:
+        cprint("%s", report)
+    else:
+        cprint("No near duplicates found!")
     PrintHooks.spacer()
 
     # TODO: Handle concepts that subsume other concepts, e.g. find ones like this even

@@ -1,9 +1,9 @@
 from chopdiff.transforms import WINDOW_2_PARA
 
-from kash.concepts.concept_formats import concepts_from_bullet_points
 from kash.config.logger import get_logger
 from kash.exec import kash_action, llm_transform_item
 from kash.kits.media.libs.concept_labels import CONCEPT_LABELS
+from kash.kits.media.libs.concept_utils import concepts_from_bullet_points
 from kash.llm_utils import LLM, Message, MessageTemplate
 from kash.llm_utils.fuzzy_parsing import is_no_results
 from kash.model import Item, LLMOptions, TitleTemplate
@@ -103,7 +103,7 @@ llm_options = LLMOptions(
 )
 
 
-@kash_action(llm_options=llm_options, title_template=TitleTemplate("Named Entities from {title}"))
+@kash_action(llm_options=llm_options, title_template=TitleTemplate("Concepts from {title}"))
 def identify_concepts(item: Item) -> Item:
     """
     Identify concepts or named entities in a text, returning a bulleted Markdown list of

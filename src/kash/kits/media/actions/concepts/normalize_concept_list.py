@@ -1,7 +1,7 @@
-from kash.concepts.concept_formats import concepts_from_bullet_points
 from kash.config.logger import get_logger
 from kash.exec import kash_action
 from kash.exec.preconditions import is_markdown_list
+from kash.kits.media.libs.concept_utils import concepts_from_bullet_points
 from kash.model import Format, Item, ItemType
 from kash.text_handling.markdown_utils import as_bullet_points
 from kash.utils.errors import InvalidInput
