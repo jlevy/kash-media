@@ -3,9 +3,6 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from functools import cached_property
-from pathlib import Path
-from typing import Any
-from urllib.parse import urlencode
 
 import requests
 import wikipediaapi
@@ -15,44 +12,9 @@ from typing_extensions import override
 from wikipediaapi import Namespace, Wikipedia, WikipediaPage
 
 from kash.config.logger import get_logger
-from kash.web_content.file_cache_utils import cache_file
-from kash.web_content.local_file_cache import Loadable
+from kash.kits.media.utils.cache_rate_limit import CachingSession
 
 log = get_logger(__name__)
-
-
-class CachingSession(requests.Session):
-    def __init__(self):
-        super().__init__()
-
-    @override
-    def get(self, url: str | bytes, **kwargs: Any) -> Any:
-        # Extract params for cache key generation if present
-        params = kwargs.get("params")
-        # We need a unique key for the cache, so we use the URL and params.
-        url_str = url.decode() if isinstance(url, bytes) else str(url)
-        query_string = urlencode(params or {})
-        url_key = f"{url_str}?{query_string}" if query_string else url_str
-
-        orig_session = super()
-
-        def save(path: Path):
-            response = orig_session.get(url, **kwargs)
-            response.raise_for_status()
-            response.raw.decode_content = True
-            with open(path, "wb") as f:
-                f.write(response.content)
-
-        path, was_cached = cache_file(Loadable(url_key, save))
-        if was_cached:
-            log.warning("Wikipedia API cache hit: %s", url_key)
-
-        # A simple hack to make sure response.json() works.
-        response = requests.Response()
-        response.status_code = 200
-        response.encoding = "utf-8"
-        response._content = path.read_bytes()
-        return response
 
 
 WIKI_LANGUAGE = "en"
@@ -66,8 +28,9 @@ _wiki: Wikipedia = wikipediaapi.Wikipedia(
     language=WIKI_LANGUAGE, user_agent=wikipediaapi.USER_AGENT
 )
 
+
 # Hot patch the session to use our caching session.
-_wiki._session = CachingSession()  # pyright: ignore[reportPrivateUsage]
+_wiki._session = CachingSession(limit=3, limit_interval_secs=1)  # pyright: ignore[reportPrivateUsage]
 
 
 @dataclass(frozen=True)
@@ -91,6 +54,10 @@ class WikiPageResult:
     def score_str(self) -> str:
         return f"score {self.total_score:.2f} (title {self.title_score:.1f}, notability {self.notability_score:.2f})"
 
+    @override
+    def __str__(self) -> str:
+        return f"WikiPageResult({self.page.title!r} {self.score_str()})"
+
 
 @dataclass(frozen=True)
 class WikiSearchResults:
@@ -106,34 +73,46 @@ class WikiSearchResults:
     def __bool__(self) -> bool:
         return bool(self.page_results)
 
+    @override
+    def __str__(self) -> str:
+        results_str = ", ".join(str(x) for x in self.page_results)
+        return f"WikiSearchResults(unambiguous={self.has_unambigous_match} {results_str})"
+
 
 def _assemble_search_results(
-    concept: str,
+    concept_str: str,
     pages: list[WikipediaPage],
-    min_notability_score: float = 4.0,
+    min_notability_score: float = 3.5,
     min_title_score: float = 2.0,
-    unambiguous_threshold: float = 6.0,
+    unambiguous_threshold: float = 4.0,
     unambiguous_cutoff: float = 2,
 ) -> WikiSearchResults:
     results: list[WikiPageResult] = []
 
+    log.message("Checking if wikipedia has an unambiguous match: %r", concept_str)
     # Assemble results, excluding any disambiguation pages.
     disambiguation_page = None
     for page in pages:
         if wiki_is_disambiguation_page(page):
             if not disambiguation_page:
+                log.message("Wikipedia disambiguation page: %r", page.title)
                 disambiguation_page = page
             continue
         if wiki_is_list_page(page):
             continue
-        if calculate_notability_score(page) < min_notability_score:
+        notability_score = calculate_notability_score(page)
+        if notability_score < min_notability_score:
+            log.message(
+                "Wikipedia page not notable (notability score %.2f < %.2f): %r",
+                notability_score,
+                min_notability_score,
+                page.title,
+            )
             continue
-        results.append(WikiPageResult(page=page, title_score=wiki_title_score(concept, page)))
+        title_score = wiki_title_score(concept_str, page)
+        results.append(WikiPageResult(page=page, title_score=title_score))
 
-    # Is there a single, notable page that matches the query?
-    if disambiguation_page:
-        is_unambiguous = False
-    elif len(results) == 0:
+    if len(results) == 0:
         is_unambiguous = False
     elif len(results) == 1:
         is_unambiguous = True
@@ -152,6 +131,10 @@ def _assemble_search_results(
                 sorted_results[1].page.title,
                 sorted_results[1].score_str(),
             )
+            # Sometimes there are disambiguation pages even if it's really obviously the first hit.
+            # Let's just increase the threshold to allow for that.
+            if disambiguation_page:
+                unambiguous_threshold += 1.0
             is_unambiguous = (
                 max_score > unambiguous_threshold
                 and (max_score - second_score) > unambiguous_cutoff
@@ -166,7 +149,7 @@ def _assemble_search_results(
 
 @retry(wait=wait_random_exponential(min=1, max=10), stop=stop_after_attempt(5))
 def wiki_article_search_raw(
-    concept: str, *, max_results: int = 5, timeout: float = 10
+    query_str: str, *, max_results: int = 5, timeout: float = 10
 ) -> list[WikipediaPage]:
     """
     Finds Wikipedia pages related to a concept using MediaWiki API search.
@@ -177,11 +160,12 @@ def wiki_article_search_raw(
         search_params = {
             "action": "query",
             "list": "search",
-            "srsearch": concept,
+            "srsearch": query_str,
             "srlimit": max_results,
             "format": "json",
         }
 
+        log.message("Wikipedia search: %r", search_params)
         # Use our own patched caching session.
         response = _wiki._session.get(  # pyright: ignore[reportPrivateUsage]
             get_wiki_api_base_url(), params=search_params, timeout=timeout
@@ -191,7 +175,7 @@ def wiki_article_search_raw(
 
         titles = [item["title"] for item in search_data.get("query", {}).get("search", [])]
         if not titles:
-            log.warning("No search results found for concept: %r", concept)
+            log.warning("No search results found for concept: %r", query_str)
             return []
 
         results: list[WikipediaPage] = []
@@ -202,7 +186,7 @@ def wiki_article_search_raw(
                 log.debug(
                     "Page '%s' for concept '%s' does not exist or is a redirect loop.",
                     title,
-                    concept,
+                    query_str,
                 )
                 continue
             # Ensure we get the final title after potential redirects
@@ -211,39 +195,41 @@ def wiki_article_search_raw(
             page = _wiki.page(final_title)
             if not page.exists():  # Double check after redirect resolution
                 log.warning(
-                    "Redirected page '%s' for concept '%s' does not exist.", final_title, concept
+                    "Redirected page '%s' for concept '%s' does not exist.", final_title, query_str
                 )
                 continue
 
             results.append(page)
 
         if not results:
-            log.warning("No valid pages found after checking existence for concept: %r", concept)
+            log.warning("No valid pages found after checking existence for concept: %r", query_str)
             return []
 
         return results
     except requests.exceptions.RequestException as e:
-        log.error("Wikipedia search: network error: %r: %s", concept, e)
+        log.error("Wikipedia search: network error: %r: %s", query_str, e)
         raise
     except Exception as e:
-        log.error("Wikipedia search: unexpected error: %r: %s", concept, e)
+        log.error("Wikipedia search: unexpected error: %r: %s", query_str, e)
         raise
 
 
-def wiki_article_search(concept: str) -> WikiSearchResults:
+def wiki_article_search(concept_str: str) -> WikiSearchResults:
     """
     Search Wikipedia for a concept and return results with additional scoring
     and disambiguation checks.
     """
-    results = wiki_article_search_raw(concept)
-    return _assemble_search_results(concept, results)
+    results = wiki_article_search_raw(concept_str)
+    results = _assemble_search_results(concept_str, results)
+    log.message("Wikipedia search results: %s", results)
+    return results
 
 
-def wiki_title_score(concept: str, page: WikipediaPage) -> float:
+def wiki_title_score(concept_str: str, page: WikipediaPage) -> float:
     """
     Calculate the fuzzy match between a concept and a Wikipedia page title.
     """
-    s1 = concept.lower()
+    s1 = concept_str.lower()
     s2 = page.title.lower()
     return 0.5 * fuzz.ratio(s1, s2) + 0.5 * fuzz.partial_ratio(s1, s2)
 

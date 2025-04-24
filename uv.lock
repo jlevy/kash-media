@@ -1111,6 +1111,7 @@ dependencies = [
     { name = "kash-shell" },
     { name = "opencv-python" },
     { name = "pandas" },
+    { name = "pyrate-limiter" },
     { name = "requests" },
     { name = "rich" },
     { name = "rich-argparse" },
@@ -1142,6 +1143,7 @@ requires-dist = [
     { name = "kash-shell", git = "https://github.com/jlevy/kash-shell.git" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
     { name = "pandas", specifier = ">=2.2.3" },
+    { name = "pyrate-limiter", specifier = ">=3.7.0" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "rich", specifier = ">=14.0.0" },
     { name = "rich-argparse", specifier = ">=1.7.0" },
@@ -2063,6 +2065,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/69/56/e4d7e1bd70d997713649c5ce530b2d15a5fc2245a74ca820fc2d51d89d4d/pyphen-0.17.2.tar.gz", hash = "sha256:f60647a9c9b30ec6c59910097af82bc5dd2d36576b918e44148d8b07ef3b4aa3", size = 2079470 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/7b/1f/c2142d2edf833a90728e5cdeb10bdbdc094dde8dbac078cee0cf33f5e11b/pyphen-0.17.2-py3-none-any.whl", hash = "sha256:3a07fb017cb2341e1d9ff31b8634efb1ae4dc4b130468c7c39dd3d32e7c3affd", size = 2079358 },
+]
+
+[[package]]
+name = "pyrate-limiter"
+version = "3.7.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/3e/b6/a812da6cbcb3861c4389fc42114a77d3628d2a9948fbc5f308c35fecaed0/pyrate_limiter-3.7.0.tar.gz", hash = "sha256:dc1e6d2c80b559f3333cb44bd822bd558f5a47946dc50cce4263a9c1c5fd8067", size = 281878 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/92/1b/c6154663593ffecb18e9463be7a1190bcf37fe360d0fce4153771472ee6e/pyrate_limiter-3.7.0-py3-none-any.whl", hash = "sha256:cdbfc8f537d07e2bda76f5191b38aee972b26e1af020d880e3c1ef9d528227ac", size = 28286 },
 ]
 
 [[package]]
