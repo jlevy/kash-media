@@ -1,14 +1,23 @@
-from kash.concepts.concept_formats import concepts_from_bullet_points, normalize_concepts
 from kash.config.logger import get_logger
 from kash.exec import kash_action
 from kash.exec.preconditions import is_markdown_list
-from kash.model import ONE_OR_MORE_ARGS, ActionInput, ActionResult, Format, Item, ItemType
+from kash.kits.media.libs.concept_utils import concepts_from_bullet_points
+from kash.model import (
+    ONE_OR_MORE_ARGS,
+    ActionInput,
+    ActionResult,
+    Concept,
+    Format,
+    Item,
+    ItemType,
+    normalize_concepts,
+)
 from kash.utils.errors import InvalidInput
 
 log = get_logger(__name__)
 
 
-def as_concept_items(concepts: list[str]) -> list[Item]:
+def as_concept_items(concepts: list[Concept]) -> list[Item]:
     concept_items = []
     for concept in concepts:
         concept_item = Item(

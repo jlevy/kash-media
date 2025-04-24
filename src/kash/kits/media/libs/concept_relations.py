@@ -3,10 +3,10 @@ from collections.abc import Callable
 import pandas as pd
 from funlog import tally_calls
 
-from kash.concepts.cosine import ArrayLike
-from kash.concepts.embeddings import Embeddings
-from kash.concepts.text_similarity import cosine_relatedness
 from kash.config.logger import get_logger
+from kash.embeddings.cosine import ArrayLike
+from kash.embeddings.embeddings import Embeddings
+from kash.embeddings.text_similarity import cosine_relatedness
 
 log = get_logger(__name__)
 

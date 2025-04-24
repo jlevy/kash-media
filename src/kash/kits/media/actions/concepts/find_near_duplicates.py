@@ -1,7 +1,7 @@
 from chopdiff.util import lemmatized_equal
 
-from kash.concepts.embeddings import Embeddings
 from kash.config.logger import get_logger
+from kash.embeddings.embeddings import Embeddings
 from kash.exec import kash_action
 from kash.exec.preconditions import is_concept, is_text_doc
 from kash.kits.media.libs.concept_relations import (

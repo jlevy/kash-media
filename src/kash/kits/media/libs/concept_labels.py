@@ -14,7 +14,6 @@ log = get_logger(__name__)
 class ConceptLabel:
     label: str
     description: str
-    is_quantitative: bool = False  # True if it doesn't make sense to use for annotations/indexing
 
     @override
     def __str__(self) -> str:
@@ -22,24 +21,24 @@ class ConceptLabel:
 
 
 CONCEPT_LABELS = [
-    ConceptLabel(
-        "date",
-        "absolute or relative dates or periods (e.g. 1995, 2020-01-01, 2020 BC)",
-        is_quantitative=True,
-    ),
-    ConceptLabel("time", "time units smaller than a day", is_quantitative=True),
-    ConceptLabel("monetary", "monetary values, including number and unit", is_quantitative=True),
-    ConceptLabel(
-        "quantity",
-        "numeric measurements, e.g., weight or distance, including number and "
-        "unit ('25km', 'five ounces')",
-        is_quantitative=True,
-    ),
-    ConceptLabel(
-        "number",
-        "numeric values, including percentages (e.g., 'twenty percent', '18%')",
-        is_quantitative=True,
-    ),
+    # ConceptLabel("time", "time units smaller than a day", is_quantitative=True),
+    # ConceptLabel("monetary", "monetary values, including number and unit", is_quantitative=True),
+    # ConceptLabel(
+    #     "quantity",
+    #     "numeric measurements, e.g., weight or distance, including number and "
+    #     "unit ('25km', 'five ounces')",
+    #     is_quantitative=True,
+    # ),
+    # ConceptLabel(
+    #     "number",
+    #     "numeric values, including percentages (e.g., 'twenty percent', '18%')",
+    #     is_quantitative=True,
+    # ),
+    # ConceptLabel(
+    #     "date",
+    #     "absolute or relative dates or periods (e.g. 1995, 2020-01-01, 2020 BC)",
+    #     is_quantitative=True,
+    # ),
     ConceptLabel("person", "people, including real, historical, and fictional characters"),
     ConceptLabel("facility", "buildings, airports, highways, bridges"),
     ConceptLabel("organization", "organizations, companies, agencies, institutions"),
@@ -98,7 +97,8 @@ CONCEPT_LABELS = [
     ),
     ConceptLabel(
         "concept",
-        "any other well-defined concept as it might appear in the index of a book "
-        "(e.g. dieting, furniture, the stock market, social media)",
+        "any specific well-defined concept as it might appear in the index of a book "
+        "(e.g. dieting, furniture, the stock market, social media) but DO NOT include very general "
+        "concepts like people, power, problem, solution, a number, etc.",
     ),
 ]
