@@ -26,8 +26,10 @@ dependencies = [
     "rich>=14.0.0",
     "rich-argparse>=1.7.0",
     "typing-extensions>=4.11.1",
+    "pyrate-limiter>=3.7.0",
     # Content tools:
     "chopdiff>=0.1.3",
+    "simplemma>=1.1.2",
     # For printing. Note weasyprint has install dep issues on macos depending on the python version.
     # https://github.com/Kozea/WeasyPrint/issues/2112
     # https://github.com/Kozea/WeasyPrint/issues/1448
@@ -44,8 +46,15 @@ dependencies = [
     "thefuzz>=0.22.1",
     "wikipedia-api>=0.8.1",
     "pandas>=2.2.3",
-    "simplemma>=1.1.2",
-    "pyrate-limiter>=3.7.0",
+    # Including both pandoc and markitdown as each has its own idiosyncrasies.
+    "pypandoc-binary>=1.15",
+    "markitdown[all]>=0.1.1",
+    # MegaParse may be useful but seems brittle and has lots of deps?
+    # "megaparse>=0.0.45",
+    # "langchain-core>=0.3.56",
+    # "langchain-openai>=0.3.14",
+    # "unstructured>=0.17.2",
+    # "llama-parse>=0.6.12",
 ]
 
 [dependency-groups]
