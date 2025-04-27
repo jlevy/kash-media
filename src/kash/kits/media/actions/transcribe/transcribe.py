@@ -1,6 +1,6 @@
 from chopdiff.divs import parse_divs
 
-import kash.kits.media.libs  # noqa: F401  # Ensure all media tools are available.
+import kash.kits.media.docs  # noqa: F401  # Ensure all media tools are available.
 from kash.config.logger import get_logger
 from kash.exec import kash_action
 from kash.exec.preconditions import is_audio_resource, is_url_item, is_video_resource

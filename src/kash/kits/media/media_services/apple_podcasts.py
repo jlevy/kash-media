@@ -9,7 +9,7 @@ from yt_dlp.utils import DownloadError
 
 from kash.config.logger import get_logger
 from kash.config.text_styles import EMOJI_WARN
-from kash.kits.media.libs.yt_dlp_tools import ydl_download_media, ydl_extract_info
+from kash.kits.media.utils.yt_dlp_tools import ydl_download_media, ydl_extract_info
 from kash.model.media_model import SERVICE_APPLE_PODCASTS, MediaMetadata, MediaService, MediaUrlType
 from kash.utils.common.type_utils import not_none
 from kash.utils.common.url import Url
@@ -25,9 +25,6 @@ log = get_logger(__name__)
 # https://podcasts.apple.com/podcast/id1303792223?i=1000394194840
 # See:
 # https://podcasters.apple.com/support/847-hosts-and-guests
-
-# mypy is falsely complaining.
-# mypy: disable-error-code="override,misc"
 
 
 class ApplePodcasts(MediaService):

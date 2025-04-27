@@ -1,10 +1,10 @@
 from dataclasses import asdict, dataclass
+from pathlib import Path
 
 from frontmatter_format import to_yaml_string
 
 from kash.config.logger import get_logger
-from kash.kits.media.libs import media_templates_dir
-from kash.kits.media.libs.media_preconditions import is_youtube_video
+from kash.kits.media.video.video_preconditions import is_youtube_video
 from kash.llm_utils.clean_headings import clean_heading, summary_heading
 from kash.media_base.media_services import get_media_id
 from kash.model.items_model import Item, ItemType
@@ -16,6 +16,9 @@ from kash.web_gen.template_render import render_web_template
 from kash.workspaces.source_items import find_upstream_item
 
 log = get_logger(__name__)
+
+
+templates_dir = Path(__file__).parent / "templates"
 
 
 @dataclass
@@ -75,7 +78,7 @@ def video_gallery_generate(config_item: Item) -> str:
     video_gallery = as_dataclass(config, VideoGallery)  # Checks the format.
 
     content = render_web_template(
-        media_templates_dir,
+        templates_dir,
         "youtube_gallery.html.jinja",
         asdict(video_gallery),
     )

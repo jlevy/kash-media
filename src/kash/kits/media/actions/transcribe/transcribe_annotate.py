@@ -1,15 +1,12 @@
-from kash.config.logger import get_logger
 from kash.exec import kash_action
 from kash.exec.preconditions import is_audio_resource, is_url_item, is_video_resource
-from kash.kits.media.actions.insert_frame_captures import insert_frame_captures
 from kash.kits.media.actions.text.add_description import add_description
 from kash.kits.media.actions.text.add_summary_bullets import add_summary_bullets
 from kash.kits.media.actions.text.caption_paras import caption_paras
 from kash.kits.media.actions.text.insert_section_headings import insert_section_headings
+from kash.kits.media.actions.transcribe.insert_frame_captures import insert_frame_captures
 from kash.kits.media.actions.transcribe.transcribe_format import transcribe_format
 from kash.model import Item, common_params
-
-log = get_logger(__name__)
 
 
 @kash_action(

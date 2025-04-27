@@ -8,7 +8,7 @@ from typing_extensions import override
 
 from kash.config.logger import get_logger
 from kash.config.text_styles import EMOJI_WARN
-from kash.kits.media.libs.yt_dlp_tools import parse_date, ydl_download_media, ydl_extract_info
+from kash.kits.media.utils.yt_dlp_tools import parse_date, ydl_download_media, ydl_extract_info
 from kash.model.media_model import (
     SERVICE_YOUTUBE,
     HeatmapValue,
@@ -25,10 +25,6 @@ log = get_logger(__name__)
 
 
 VIDEO_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{11}$")
-
-
-# mypy is falsely complaining.
-# mypy: disable-error-code="override,misc"
 
 
 class YouTube(MediaService):

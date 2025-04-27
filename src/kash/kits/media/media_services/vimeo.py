@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from typing_extensions import override
 
 from kash.config.logger import get_logger
-from kash.kits.media.libs.yt_dlp_tools import parse_date, ydl_download_media, ydl_extract_info
+from kash.kits.media.utils.yt_dlp_tools import parse_date, ydl_download_media, ydl_extract_info
 from kash.model.media_model import MediaMetadata, MediaService, MediaUrlType
 from kash.utils.common.type_utils import not_none
 from kash.utils.common.url import Url
@@ -18,10 +18,6 @@ log = get_logger(__name__)
 
 VIDEO_PATTERN = r"^/(\d+)$"
 CHANNEL_PATTERN = r"^/([a-zA-Z0-9_-]+)$"
-
-
-# mypy is falsely complaining.
-# mypy: disable-error-code="override,misc"
 
 
 class Vimeo(MediaService):

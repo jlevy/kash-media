@@ -1,7 +1,7 @@
 from kash.config.logger import get_logger
 from kash.exec import kash_action
 from kash.exec.preconditions import is_markdown_list
-from kash.kits.media.libs.concept_utils import concepts_from_bullet_points
+from kash.kits.media.concepts.concept_utils import concepts_from_bullet_points
 from kash.model import (
     ONE_OR_MORE_ARGS,
     ActionInput,

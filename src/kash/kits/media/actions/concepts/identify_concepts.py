@@ -2,8 +2,8 @@ from chopdiff.transforms import WINDOW_2_PARA
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action, llm_transform_item
-from kash.kits.media.libs.concept_labels import CONCEPT_LABELS
-from kash.kits.media.libs.concept_utils import concepts_from_bullet_points
+from kash.kits.media.concepts.concept_labels import CONCEPT_LABELS
+from kash.kits.media.concepts.concept_utils import concepts_from_bullet_points
 from kash.llm_utils import LLM, LLMName, Message, MessageTemplate
 from kash.llm_utils.fuzzy_parsing import is_no_results
 from kash.model import Item, LLMOptions, TitleTemplate, common_params

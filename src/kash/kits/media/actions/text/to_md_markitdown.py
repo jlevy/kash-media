@@ -1,6 +1,6 @@
 from kash.exec import kash_action
 from kash.exec.preconditions import is_doc_resource
-from kash.kits.media.actions.text.markitdown_custom_docx import CustomDocxConverter
+from kash.kits.media.docs.markitdown_custom_docx import CustomDocxConverter
 from kash.model import Format, Item, ItemType
 from kash.utils.errors import InvalidInput
 from kash.workspaces.workspaces import current_ws

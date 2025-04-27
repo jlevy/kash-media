@@ -7,8 +7,10 @@ import_and_register(
     Path(__file__).parent,
     [
         "actions",
-        "libs",
+        "concepts",
+        "docs",
         "media_services",
+        "video",
         "wiki",
     ],
 )

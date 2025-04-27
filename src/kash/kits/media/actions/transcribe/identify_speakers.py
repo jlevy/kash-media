@@ -6,7 +6,7 @@ from strif import StringTemplate, replace_multiple
 from kash.config.logger import get_logger
 from kash.exec import kash_action
 from kash.exec.preconditions import has_html_body, has_text_body
-from kash.kits.media.libs.speaker_labels import find_speaker_labels
+from kash.kits.media.video.speaker_labels import find_speaker_labels
 from kash.llm_utils import LLM, Message, MessageTemplate
 from kash.llm_utils.fuzzy_parsing import fuzzy_parse_json
 from kash.llm_utils.llm_completion import llm_template_completion

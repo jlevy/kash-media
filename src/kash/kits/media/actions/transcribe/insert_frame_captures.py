@@ -7,8 +7,8 @@ from strif import Insertion, insert_multiple
 from kash.config.logger import get_logger
 from kash.exec import kash_action, kash_precondition
 from kash.exec.preconditions import has_timestamps, is_text_doc
-from kash.kits.media.libs.image_similarity import filter_similar_frames
-from kash.kits.media.libs.video_frames import capture_frames
+from kash.kits.media.video.image_similarity import filter_similar_frames
+from kash.kits.media.video.video_frames import capture_frames
 from kash.model import Format, Item, ItemType, Param
 from kash.utils.common.format_utils import fmt_loc
 from kash.utils.common.url import as_file_url

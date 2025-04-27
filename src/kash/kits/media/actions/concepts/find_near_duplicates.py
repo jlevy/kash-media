@@ -4,7 +4,7 @@ from kash.config.logger import get_logger
 from kash.embeddings.embeddings import Embeddings
 from kash.exec import kash_action
 from kash.exec.preconditions import is_concept, is_text_doc
-from kash.kits.media.libs.concept_relations import (
+from kash.kits.media.concepts.concept_relations import (
     find_related_pairs,
     relate_texts_by_embedding,
 )

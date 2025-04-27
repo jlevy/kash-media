@@ -3,16 +3,18 @@ import os
 import platform
 from datetime import datetime
 from logging import ERROR
+from pathlib import Path
 from textwrap import dedent
 
 from strif import atomic_output_file
 
 from kash.config.settings import APP_NAME
-from kash.kits.media.libs import media_templates_dir
 from kash.web_gen import base_templates_dir as common_templates_dir
 from kash.web_gen.template_render import render_web_template
 
 log = logging.getLogger(__name__)
+
+templates_dir = Path(__file__).parent / "templates"
 
 
 def weasyprint_setup() -> None:
@@ -76,7 +78,7 @@ def html_to_pdf(
         """
 
     extra_css = render_web_template(
-        media_templates_dir,
+        templates_dir,
         "pdf_styles.css.jinja",
         {
             "title": title,
