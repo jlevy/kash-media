@@ -1,4 +1,6 @@
 import sys
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, BinaryIO
 
 import mammoth
@@ -71,6 +73,7 @@ class CustomDocxConverter(DocxConverter):
 
         html_result = mammoth.convert_to_html(file_stream, style_map=style_map)
         html_content = html_result.value
+        # log.save_object("raw html", "html_converted", html_content)
 
         # Add custom markdownify options to the kwargs.
         combined_options = {**kwargs, **self.markdownify_options}
@@ -78,3 +81,34 @@ class CustomDocxConverter(DocxConverter):
         return self._html_converter.convert_string(
             html_content, url=stream_info.url, **combined_options
         )
+
+
+@dataclass(frozen=True)
+class MarkdownResult:
+    markdown: str
+    title: str | None
+
+
+def docx_to_md(docx_path: Path) -> MarkdownResult:
+    """
+    Convert a docx file to clean markdown using MarkItDown, which wraps
+    Mammoth and Markdownify. Does not normalize the Markdown.
+    """
+
+    from markitdown import MarkItDown
+
+    # Preserve superscript and subscripts, which are important for
+    # Gemini Deep Research report docx files.
+    # https://github.com/matthewwithanm/python-markdownify
+    docx_converter = CustomDocxConverter(
+        markdownify_options={
+            "sup_symbol": "<sup>",
+            "sub_symbol": "<sub>",
+        }
+    )
+    mid = MarkItDown(enable_plugins=False)
+    mid.register_converter(docx_converter)
+    result = mid.convert(docx_path)
+
+    # Perhaps worth exposing raw HTML too?
+    return MarkdownResult(markdown=result.markdown, title=result.title)
