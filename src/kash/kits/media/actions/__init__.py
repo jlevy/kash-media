@@ -7,6 +7,7 @@ import_and_register(
     Path(__file__).parent,
     [
         "concepts",
+        "publish",
         "text",
         "transcribe",
     ],

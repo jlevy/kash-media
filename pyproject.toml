@@ -34,6 +34,8 @@ dependencies = [
     # https://github.com/Kozea/WeasyPrint/issues/2112
     # https://github.com/Kozea/WeasyPrint/issues/1448
     "weasyprint>=63.1",
+    # For S3/AWS:
+    "boto3>=1.38.3",
     # For downloading media:
     "yt-dlp>=2025.3.27",
     "curl-cffi>=0.7.4",
@@ -49,12 +51,6 @@ dependencies = [
     # Including both pandoc and markitdown as each has its own idiosyncrasies.
     "pypandoc-binary>=1.15",
     "markitdown[all]>=0.1.1",
-    # MegaParse may be useful but seems brittle and has lots of deps?
-    # "megaparse>=0.0.45",
-    # "langchain-core>=0.3.56",
-    # "langchain-openai>=0.3.14",
-    # "unstructured>=0.17.2",
-    # "llama-parse>=0.6.12",
 ]
 
 [dependency-groups]
