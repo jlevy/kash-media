@@ -7,9 +7,13 @@ from kash.config.logger import get_logger
 from kash.config.text_styles import COLOR_STATUS
 from kash.exec import kash_action
 from kash.exec.preconditions import has_html_body
-from kash.kits.media.utils.s3_utils import s3_upload_path
+from kash.kits.media.utils.s3_utils import (
+    map_s3_urls_to_public_urls,
+    s3_upload_path,
+)
 from kash.model import ActionInput, ActionResult, common_params
 from kash.shell.output.shell_output import cprint
+from kash.utils.common.url import Url
 from kash.utils.errors import InvalidInput
 from kash.workspaces import current_ws
 
@@ -40,7 +44,7 @@ def s3_upload(
 
     ws = current_ws()
 
-    uploaded_s3_urls: list[str] = []
+    uploaded_s3_urls: list[Url] = []
     for item in input.items:
         if not item.store_path:
             raise InvalidInput(f"Missing store_path for item: {item}")
@@ -50,5 +54,14 @@ def s3_upload(
     cprint(
         f"Uploaded files:\n{fmt_lines(uploaded_s3_urls)}", style=COLOR_STATUS, text_wrap=Wrap.NONE
     )
+
+    # As a convenience check for public URLs if we can find them.
+    public_urls: dict[Url, Url | None] = map_s3_urls_to_public_urls(uploaded_s3_urls)
+    if public_urls.values():
+        cprint(
+            f"Public URLs for these S3 objects:\n{fmt_lines(public_urls.values())}",
+            style=COLOR_STATUS,
+            text_wrap=Wrap.NONE,
+        )
 
     return ActionResult(items=input.items)

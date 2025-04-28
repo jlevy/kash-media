@@ -9,8 +9,13 @@ from kash.workspaces.workspaces import current_ws
 @kash_action(precondition=is_docx_resource, mcp_tool=True)
 def docx_to_md(item: Item) -> Item:
     """
-    Convert a docx file to markdown using MarkItDown, which wraps Mammoth and
-    Markdownify.
+    Convert a docx file to clean Markdown, hopefully in good enough shape
+    to publish. Uses MarkItDown/Mammoth/Markdownify and a few additional
+    cleanups.
+
+    This works well to convert docx files from Gemini Deep Research
+    output: click to export a report to Google Docs, then select `File >
+    Download > Microsoft Word (.docx)`.
     """
 
     if not item.store_path:
