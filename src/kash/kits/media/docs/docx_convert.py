@@ -1,7 +1,10 @@
+import logging
+import re
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, BinaryIO
+from typing import Any, BinaryIO, cast
 
 import mammoth
 from markitdown._base_converter import DocumentConverterResult
@@ -9,6 +12,8 @@ from markitdown._exceptions import MISSING_DEPENDENCY_MESSAGE, MissingDependency
 from markitdown._stream_info import StreamInfo
 from markitdown.converters._docx_converter import DocxConverter
 from typing_extensions import override
+
+log = logging.getLogger(__name__)
 
 # Based on markitdown.converters._docx_converter.DocxConverter.
 
@@ -25,22 +30,34 @@ ACCEPTED_MIME_TYPE_PREFIXES = [
 ACCEPTED_FILE_EXTENSIONS = [".docx"]
 
 
+class CustomDCResult(DocumentConverterResult):
+    def __init__(self, *, html: str, md: str, title: str | None):
+        super().__init__(markdown=md, title=title)
+        self.html: str = html
+
+
 class CustomDocxConverter(DocxConverter):
     """
-    A custom DocxConverter derived from the original, modified to allow passing Markdownify
-    options to the underlying Markdownify HtmlConverter.
+    A custom DocxConverter derived from the original, modified to allow passing
+    Markdownify options to the underlying Markdownify HtmlConverter. Also exposes
+    the raw HTML, which is sometimes useful at least for debugging.
 
     See options:
     https://github.com/matthewwithanm/python-markdownify
     """
 
-    def __init__(self, markdownify_options: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        markdownify_options: dict[str, Any] | None = None,
+        html_postprocess: Callable[[str], str] | None = None,
+    ):
         """
         Initializes the converter, storing custom markdownify options.
         """
         super().__init__()  # Call base class init (initializes self._html_converter)
         # Store custom options for markdownify
         self.markdownify_options = markdownify_options if markdownify_options is not None else {}  # pyright: ignore
+        self.html_postprocess: Callable[[str], str] | None = html_postprocess
 
     @override
     def convert(
@@ -50,7 +67,7 @@ class CustomDocxConverter(DocxConverter):
         **kwargs: Any,  # Options passed from MarkItDown.convert (e.g., llm_client)
     ) -> DocumentConverterResult:
         """
-        Converts the DOCX stream using mammoth, then converts the resulting
+        Converts the docx stream using Mammoth, then converts the resulting
         HTML to Markdown using the internal HtmlConverter, passing along
         any stored markdownify options.
         """
@@ -73,23 +90,47 @@ class CustomDocxConverter(DocxConverter):
 
         html_result = mammoth.convert_to_html(file_stream, style_map=style_map)
         html_content = html_result.value
-        # log.save_object("raw html", "html_converted", html_content)
+
+        if self.html_postprocess:
+            log.info("Postprocessing HTML with %s", self.html_postprocess)
+            html_content = self.html_postprocess(html_content)
 
         # Add custom markdownify options to the kwargs.
         combined_options = {**kwargs, **self.markdownify_options}
 
-        return self._html_converter.convert_string(
+        result = self._html_converter.convert_string(
             html_content, url=stream_info.url, **combined_options
+        )
+        return CustomDCResult(
+            html=html_content,
+            md=result.markdown,
+            title=result.title,
         )
 
 
 @dataclass(frozen=True)
 class MarkdownResult:
+    raw_html: str
     markdown: str
     title: str | None
 
 
-def docx_to_md(docx_path: Path) -> MarkdownResult:
+_sup_pattern = re.compile(r" +<sup>")
+
+
+def tighten_superscript_footnotes(html: str) -> str:
+    """
+    Google Gemini has a bad habit of putting extra space before superscript
+    footnotes in docx expots.
+    """
+    return _sup_pattern.sub("<sup>", html)
+
+
+def docx_to_md(
+    docx_path: Path,
+    *,
+    html_postprocess: Callable[[str], str] | None = tighten_superscript_footnotes,
+) -> MarkdownResult:
     """
     Convert a docx file to clean markdown using MarkItDown, which wraps
     Mammoth and Markdownify. Does not normalize the Markdown.
@@ -104,11 +145,11 @@ def docx_to_md(docx_path: Path) -> MarkdownResult:
         markdownify_options={
             "sup_symbol": "<sup>",
             "sub_symbol": "<sub>",
-        }
+        },
+        html_postprocess=html_postprocess,
     )
     mid = MarkItDown(enable_plugins=False)
     mid.register_converter(docx_converter)
-    result = mid.convert(docx_path)
+    result = cast(CustomDCResult, mid.convert(docx_path))
 
-    # Perhaps worth exposing raw HTML too?
-    return MarkdownResult(markdown=result.markdown, title=result.title)
+    return MarkdownResult(raw_html=result.html, markdown=result.markdown, title=result.title)
