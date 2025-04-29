@@ -115,21 +115,32 @@ class MarkdownResult:
     title: str | None
 
 
-_sup_pattern = re.compile(r" +<sup>")
+_sup_space_pattern = re.compile(r" +<sup>")
+# Match ~ not preceded or followed by another ~
+_standalone_tilde_pattern = re.compile(r"(?<!~)~(?!~)")
 
 
-def tighten_superscript_footnotes(html: str) -> str:
+def default_html_postprocess(html: str) -> str:
     """
+    A few hacks to cleant up corner cases:
+
     Google Gemini has a bad habit of putting extra space before superscript
-    footnotes in docx expots.
+    footnotes in docx exports.
+
+    Also escape standalone ~ characters to avoid misinterpretation
+    by markdownify as strikethrough.
     """
-    return _sup_pattern.sub("<sup>", html)
+    # XXX Hack using a different char since it was tricky to get an escape sequence
+    # markdownify would respect.
+    html = _standalone_tilde_pattern.sub(r"～", html)
+    html = _sup_space_pattern.sub("<sup>", html)
+    return html
 
 
 def docx_to_md(
     docx_path: Path,
     *,
-    html_postprocess: Callable[[str], str] | None = tighten_superscript_footnotes,
+    html_postprocess: Callable[[str], str] | None = default_html_postprocess,
 ) -> MarkdownResult:
     """
     Convert a docx file to clean markdown using MarkItDown, which wraps

@@ -4,7 +4,7 @@ from kash.kits.media.docs import docx_convert
 from kash.model import Format, Item, ItemType
 
 
-@kash_action(precondition=is_docx_resource, mcp_tool=True)
+@kash_action(precondition=is_docx_resource)
 def docx_to_html(item: Item) -> Item:
     """
     Convert a docx file to HTML using MarkItDown/Mammoth. See

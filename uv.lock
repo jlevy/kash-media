@@ -1354,8 +1354,8 @@ dev = [
 
 [[package]]
 name = "kash-shell"
-version = "0.3.10.dev42+8d176a6"
-source = { git = "https://github.com/jlevy/kash-shell.git#8d176a6561cf06db1039e9d6dec6914bd20961ee" }
+version = "0.3.10.dev45+cc821b4"
+source = { git = "https://github.com/jlevy/kash-shell.git#cc821b4e78bac28052e8202b82ada420e8267d01" }
 dependencies = [
     { name = "anyio" },
     { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
