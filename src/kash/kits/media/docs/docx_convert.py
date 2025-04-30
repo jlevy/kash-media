@@ -13,6 +13,8 @@ from markitdown._stream_info import StreamInfo
 from markitdown.converters._docx_converter import DocxConverter
 from typing_extensions import override
 
+from kash.kits.media.docs.escape_tags import escape_html_tags
+
 log = logging.getLogger(__name__)
 
 # Based on markitdown.converters._docx_converter.DocxConverter.
@@ -50,14 +52,18 @@ class CustomDocxConverter(DocxConverter):
         self,
         markdownify_options: dict[str, Any] | None = None,
         html_postprocess: Callable[[str], str] | None = None,
+        md_postprocess: Callable[[str], str] | None = None,
     ):
         """
         Initializes the converter, storing custom markdownify options.
         """
         super().__init__()  # Call base class init (initializes self._html_converter)
         # Store custom options for markdownify
-        self.markdownify_options = markdownify_options if markdownify_options is not None else {}  # pyright: ignore
+        self.markdownify_options: dict[str, Any] = (
+            markdownify_options if markdownify_options is not None else {}
+        )
         self.html_postprocess: Callable[[str], str] | None = html_postprocess
+        self.md_postprocess: Callable[[str], str] | None = md_postprocess
 
     @override
     def convert(
@@ -96,11 +102,16 @@ class CustomDocxConverter(DocxConverter):
             html_content = self.html_postprocess(html_content)
 
         # Add custom markdownify options to the kwargs.
-        combined_options = {**kwargs, **self.markdownify_options}
+        combined_options = {**self.markdownify_options, **kwargs}
 
         result = self._html_converter.convert_string(
             html_content, url=stream_info.url, **combined_options
         )
+
+        if self.md_postprocess:
+            log.info("Postprocessing Markdown with %s", self.md_postprocess)
+            result.markdown = self.md_postprocess(result.markdown)
+
         return CustomDCResult(
             html=html_content,
             md=result.markdown,
@@ -137,10 +148,19 @@ def default_html_postprocess(html: str) -> str:
     return html
 
 
+def default_md_postprocess(md: str) -> str:
+    """
+    HTML tags originally escaped with entities get parsed and appear unescaped
+    in the Markdown so it makes sense to escape them again.
+    """
+    return escape_html_tags(md, allow_bare_md_urls=True)
+
+
 def docx_to_md(
     docx_path: Path,
     *,
     html_postprocess: Callable[[str], str] | None = default_html_postprocess,
+    md_postprocess: Callable[[str], str] | None = default_md_postprocess,
 ) -> MarkdownResult:
     """
     Convert a docx file to clean markdown using MarkItDown, which wraps
@@ -158,6 +178,7 @@ def docx_to_md(
             "sub_symbol": "<sub>",
         },
         html_postprocess=html_postprocess,
+        md_postprocess=md_postprocess,
     )
     mid = MarkItDown(enable_plugins=False)
     mid.register_converter(docx_converter)

@@ -101,13 +101,19 @@ def _assemble_search_results(
         if wiki_is_list_page(page):
             continue
         notability_score = calculate_notability_score(page)
-        if notability_score < min_notability_score:
-            log.message(
-                "Wikipedia page not notable (notability score %.2f < %.2f): %r",
-                notability_score,
-                min_notability_score,
-                page.title,
-            )
+        is_notable = notability_score >= min_notability_score
+        notable_str = (
+            f"notable (>={notability_score:.2f} >= {min_notability_score})"
+            if is_notable
+            else f"not notable (<{notability_score:.2f} < {min_notability_score})"
+        )
+        log.message(
+            "Wikipedia page notability %s: %s: %r",
+            notability_score,
+            notable_str,
+            page.title,
+        )
+        if not is_notable:
             continue
         title_score = wiki_title_score(concept_str, page)
         results.append(WikiPageResult(page=page, title_score=title_score))
