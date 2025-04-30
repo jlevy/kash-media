@@ -1,4 +1,4 @@
-from chopdiff.transforms import WINDOW_2_PARA
+from chopdiff.transforms import WINDOW_8_PARA
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action, llm_transform_item
@@ -19,7 +19,7 @@ labels_str = "\n".join(str(label) for label in CONCEPT_LABELS)
 
 llm_options = LLMOptions(
     model=LLM.default_standard,
-    windowing=WINDOW_2_PARA,
+    windowing=WINDOW_8_PARA,
     system_message=Message(
         f"""
         You are a careful editor annotating concepts as you would to produce a high-quality
@@ -30,24 +30,25 @@ llm_options = LLMOptions(
         exactly in the format it originally appears (including any capitalization or inflections)
         with the entity type in parentheses.
 
-        For concepts, DO NOT include very abstract and broad concepts.
+        For concepts, DO NOT include very abstract and broad words or concepts.
 
         For example DO NOT include these as they are too general:
-        human (concept), power (concept), technical problem (concept),
-        solutions (concept), state (concept), success (concept), three (number),
-        technology (concept), nuance (concept), information (concept), analogy (concept),
-        green (concept), fuzziness (concept)
+        human, power, technical problem,
+        solutions, state, success, three,
+        technology, nuance, information, analogy,
+        green, fuzziness
 
         DO include more specific or concrete concepts. DO include:
-        state management (concept), refactoring (concept),
-        dampening coefficient (concept), brain (concept),
-        depression (concept), pit of despair (concept), programming (activity),
+        state management, refactoring,
+        dampening coefficient, brain,
+        depression, pit of despair, programming (activity),
         graph traversal algorithms (theory), decision theory (theory)
 
         If no entities are found, return the string: "(No results)"
 
-        Each item should be labeled for clarity and to disambiguate it, with one of
-        these labels:
+        If appropriate, you may add a label to a concept to disambiguate it. If the concept
+        is unambiguous, you may omit the label. Consider using the following labels whenever
+        it disambiguates the concepts:
         {labels_str}.
         """
     ),
@@ -74,26 +75,25 @@ llm_options = LLMOptions(
         - Germany (country)
         - 1440 (date)
         - Johannes Gutenberg (person)
-        - movable-type printing press (product)
-        - literature (concept)
-        - Europe (region)
+        - movable-type printing press
+        - literature
+        - Europe (place)
         - Renaissance (event)
-        - 3,600 pages (quantity)
         - Mainz (city)
         - Venice (city)
         - Nuremberg (city)
         - Paris (city)
-        - incunabula (concept)
-        - grammar (concept)
-        - law (concept)
-        - medicine (concept)
+        - incunabula
+        - grammar
+        - law
+        - medicine
         - The Bible (book)
-        - Latin (culture)
-        - vernaculars (culture)
-        - via moderna (concept)
-        - Nominalist ideas (theory)
+        - Latin (language)
+        - vernaculars
+        - via moderna
+        - Nominalist ideas
         - William of Ockham (person)
-        - scholastic syllogism (concept)
+        - scholastic syllogism
 
 
         TASK EXAMPLE 2:

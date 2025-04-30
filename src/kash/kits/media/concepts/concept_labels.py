@@ -21,41 +21,16 @@ class ConceptLabel:
 
 
 CONCEPT_LABELS = [
-    # ConceptLabel("time", "time units smaller than a day", is_quantitative=True),
-    # ConceptLabel("monetary", "monetary values, including number and unit", is_quantitative=True),
-    # ConceptLabel(
-    #     "quantity",
-    #     "numeric measurements, e.g., weight or distance, including number and "
-    #     "unit ('25km', 'five ounces')",
-    #     is_quantitative=True,
-    # ),
-    # ConceptLabel(
-    #     "number",
-    #     "numeric values, including percentages (e.g., 'twenty percent', '18%')",
-    #     is_quantitative=True,
-    # ),
-    # ConceptLabel(
-    #     "date",
-    #     "absolute or relative dates or periods (e.g. 1995, 2020-01-01, 2020 BC)",
-    #     is_quantitative=True,
-    # ),
     ConceptLabel("person", "people, including real, historical, and fictional characters"),
     ConceptLabel("facility", "buildings, airports, highways, bridges"),
-    ConceptLabel("organization", "organizations, companies, agencies, institutions"),
+    ConceptLabel("company", "businesses and company names"),
+    ConceptLabel("organization", "non-company groups, organizations, agencies, institutions"),
     ConceptLabel("city", "names of cities, towns, villages, etc."),
     ConceptLabel("country", "names of countries, states, provinces, etc."),
     ConceptLabel(
-        "region",
-        "names of US states, Canadian provinces, or other political regions within a country",
-    ),
-    ConceptLabel(
-        "geographic area",
-        "names of any other geographic areas that are not countries, states, provinces "
-        "(e.g. Europe, Scandinavia,  etc.)",
-    ),
-    ConceptLabel(
         "place",
-        "other non-geopolitical locations, such as mountains, lakes, oceans, notable "
+        "names of regions any other geographic areas that are not countries, states, provinces "
+        "(e.g. Europe, Scandinavia,  etc.) or other non-geopolitical locations, such as mountains, lakes, oceans, notable "
         "landmarks, etc. (e.g. Lake Michigan, Mount Everest, the Pyramids at Giza)",
     ),
     ConceptLabel(
@@ -83,22 +58,43 @@ CONCEPT_LABELS = [
     ConceptLabel("artwork", "other artwork in any medium"),
     ConceptLabel("law", "named laws, acts, or legislations"),
     ConceptLabel(
+        "language",
+        "any named language (e.g. English, French, Chinese, etc.) ",
+    ),
+    ConceptLabel(
         "culture",
-        "any named language (e.g. English, French, Chinese, etc.) or culture "
-        "(e.g. Canadian, Hmong) or group (e.g. South Asian, LGBTQ)",
+        "any religious or cultural group (e.g. Catholicism, Canadians, Hmong, South Asian, LGBTQ)",
     ),
     ConceptLabel(
-        "theory",
-        "specific academic theories, philosophies, theorems (e.g. the chain rule, "
-        "Occam's Razor, existentialism)",
+        "activity", "any kind of activity or game or event (e.g. soccer, chess, deep knee bends)"
     ),
-    ConceptLabel(
-        "activity", "any kind of activity or game or event  (e.g. soccer, chess, deep knee bends)"
-    ),
-    ConceptLabel(
-        "concept",
-        "any specific well-defined concept as it might appear in the index of a book "
-        "(e.g. dieting, furniture, the stock market, social media) but DO NOT include very general "
-        "concepts like people, power, problem, solution, a number, etc.",
-    ),
+    # ConceptLabel("time", "time units smaller than a day", is_quantitative=True),
+    # ConceptLabel("monetary", "monetary values, including number and unit", is_quantitative=True),
+    # ConceptLabel(
+    #     "quantity",
+    #     "numeric measurements, e.g., weight or distance, including number and "
+    #     "unit ('25km', 'five ounces')",
+    #     is_quantitative=True,
+    # ),
+    # ConceptLabel(
+    #     "number",
+    #     "numeric values, including percentages (e.g., 'twenty percent', '18%')",
+    #     is_quantitative=True,
+    # ),
+    # ConceptLabel(
+    #     "date",
+    #     "absolute or relative dates or periods (e.g. 1995, 2020-01-01, 2020 BC)",
+    #     is_quantitative=True,
+    # ),
+    # ConceptLabel(
+    #     "theory",
+    #     "specific academic theories, philosophies, theorems (e.g. the chain rule, "
+    #     "Occam's Razor, existentialism)",
+    # ),
+    # ConceptLabel(
+    #     "concept",
+    #     "any specific well-defined concept as it might appear in the index of a book "
+    #     "(e.g. dieting, furniture, the stock market, social media) but DO NOT include very general "
+    #     "concepts like people, power, problem, solution, a number, etc.",
+    # ),
 ]
