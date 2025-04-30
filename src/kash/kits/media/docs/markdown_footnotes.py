@@ -1,9 +1,6 @@
 import logging
 import re
 
-import rich
-from ruamel.yaml.comments import LineCol
-
 log = logging.getLogger(__name__)
 
 

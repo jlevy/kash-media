@@ -8,6 +8,7 @@ from kash.config.text_styles import COLOR_STATUS
 from kash.exec import kash_action
 from kash.exec.preconditions import has_html_body
 from kash.kits.media.utils.s3_utils import (
+    invalidate_s3_urls_in_cf,
     map_s3_urls_to_public_urls,
     s3_upload_path,
 )
@@ -26,9 +27,10 @@ def s3_upload(
 ) -> ActionResult:
     """
     Uploads one or more local files/directories (items) to an S3 bucket.
-
     Requires S3 bucket and optional prefix configured in the action input.
     Uses AWS credentials configured for boto3.
+    As a convenience, also looks for and invalidates CloudFront distributions
+    if they are found for the uploaded files.
     """
 
     bucket = s3_bucket or os.getenv("S3_BUCKET")
@@ -63,5 +65,12 @@ def s3_upload(
             style=COLOR_STATUS,
             text_wrap=Wrap.NONE,
         )
+
+        # If paths are public, also try to invalidate CloudFront distributions.
+        try:
+            invalidation_results = invalidate_s3_urls_in_cf(uploaded_s3_urls)
+            log.warning("Invalidated CloudFront distributions: %s", invalidation_results)
+        except RuntimeError as e:
+            log.warning("Failed to invalidate CloudFront distributions: %s", e)
 
     return ActionResult(items=input.items)

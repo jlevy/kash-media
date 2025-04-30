@@ -1,6 +1,8 @@
 import logging
 import mimetypes
 import re
+import time
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -10,7 +12,6 @@ from cachetools import TTLCache, cached
 from prettyfmt import fmt_path
 
 from kash.utils.common.url import Url, parse_s3_url
-from kash.utils.errors import InvalidInput
 
 log = logging.getLogger(__file__)
 
@@ -25,7 +26,7 @@ def s3_upload_path(local_path: Path, bucket: str, prefix: str = "") -> list[Url]
     or other standard boto3 credential methods.
     """
     if not local_path.exists():
-        raise InvalidInput(f"local_path must exist: {local_path}")
+        raise ValueError(f"local_path must exist: {local_path}")
 
     s3_client = boto3.client("s3")
     uploaded_s3_urls: list[Url] = []
@@ -268,3 +269,136 @@ def map_s3_urls_to_public_urls(s3_urls: list[Url]) -> dict[Url, Url | None]:
             s3_to_public_map[s3_url] = None
 
     return s3_to_public_map
+
+
+def invalidate_cf_paths(distribution_id: str, paths: list[str]) -> str:
+    """
+    Creates a CloudFront invalidation request for the specified paths.
+    Accepts a list of paths to invalidate (e.g., ['/images/*', '/index.html']).
+    Paths must start with '/'. CloudFront supports the '*' wildcard
+    character, but it must be the *last* character in the path.
+    Returns the ID of the created invalidation request.
+    Raises ValueError or boto3 exceptions on failure.
+    """
+    if not distribution_id:
+        raise ValueError("Distribution ID cannot be empty.")
+    if not paths:
+        raise ValueError("Paths list cannot be empty for invalidation.")
+
+    # Ensure paths start with '/' as required by the API
+    formatted_paths = []
+    for path in paths:
+        if not path:  # Skip empty strings if any
+            continue
+        formatted_path = path if path.startswith("/") else f"/{path}"
+        # Validate wildcard usage.
+        if "*" in formatted_path[:-1]:
+            raise ValueError(f"Wildcard '*' must be the last character in the path: {path}")
+        formatted_paths.append(formatted_path)
+
+    if not formatted_paths:
+        raise ValueError("No valid paths provided after formatting.")
+
+    cf_client = boto3.client("cloudfront")
+    # Using a timestamp for the caller reference ensures idempotency for
+    # identical requests made close together.
+    caller_reference = f"invalidation-{distribution_id}-{int(time.time())}"
+
+    log.info(
+        "Requesting invalidation for %d paths in distribution %s (Ref: %s): %s",
+        len(formatted_paths),
+        distribution_id,
+        caller_reference,
+        formatted_paths,  # Log the actual paths being invalidated
+    )
+
+    # Let ClientError or other exceptions from boto3 propagate naturally
+    response = cf_client.create_invalidation(
+        DistributionId=distribution_id,
+        InvalidationBatch={
+            "Paths": {"Quantity": len(formatted_paths), "Items": formatted_paths},
+            "CallerReference": caller_reference,
+        },
+    )
+
+    invalidation_info = response.get("Invalidation", {})
+    invalidation_id = invalidation_info.get("Id")
+    invalidation_status = invalidation_info.get("Status")
+
+    if not invalidation_id:
+        # This case indicates an unexpected API response format if no exception was raised.
+        raise RuntimeError(
+            f"CloudFront API call succeeded but did not return an Invalidation ID for distribution {distribution_id}. Response: {response}"
+        )
+
+    log.info(
+        "Successfully created invalidation request %s for distribution %s. Status: %s",
+        invalidation_id,
+        distribution_id,
+        invalidation_status,
+    )
+    return invalidation_id
+
+
+def invalidate_s3_urls_in_cf(s3_urls: list[Url]) -> dict[str, str]:
+    """
+    Invalidates paths in CloudFront distributions corresponding to given S3 URLs.
+    Groups S3 URLs by bucket, finds the first CloudFront distribution
+    associated with each bucket, and creates an invalidation request for the
+    corresponding paths (S3 keys prefixed with '/').
+    Returns dictionary mapping CloudFront distribution IDs to the created
+    invalidation IDs.
+    """
+    if not s3_urls:
+        raise ValueError("Input s3_urls list cannot be empty.")
+
+    # Group paths by bucket
+    bucket_to_paths: dict[str, list[str]] = defaultdict(list)
+    processed_buckets: set[str] = set()  # Keep track of buckets successfully parsed
+
+    for s3_url in s3_urls:
+        bucket, key = parse_s3_url(s3_url)  # Validates Url
+        processed_buckets.add(bucket)
+        bucket_to_paths[bucket].append(f"/{key}")
+
+    invalidation_results: dict[str, str] = {}
+
+    # Process invalidations bucket by bucket
+    for bucket, paths in bucket_to_paths.items():
+        log.info(f"Processing invalidation for bucket: {bucket}")
+        cf_distributions = find_cf_for_s3_bucket(bucket)
+
+        if not cf_distributions:
+            raise ValueError(f"No CloudFront distribution found for bucket: {bucket}")
+
+        # Use the first distribution found if multiple exist for the same bucket
+        if len(cf_distributions) > 1:
+            log.warning(
+                "Multiple CloudFront distributions found for bucket %s (%s). Using the first one: %s (%s)",
+                bucket,
+                [d.id for d in cf_distributions],
+                cf_distributions[0].id,
+                cf_distributions[0].domain_name,
+            )
+
+        dist_info = cf_distributions[0]
+        distribution_id = dist_info.id
+
+        # Check if we already created an invalidation for this distribution
+        # (can happen if multiple buckets point to the same CF distro, though less common)
+        if distribution_id in invalidation_results:
+            log.warning(
+                "Distribution %s already has an invalidation request (%s) created in this run.",
+                distribution_id,
+                invalidation_results[distribution_id],
+            )
+            continue
+
+        # Call the underlying invalidation function and raise exceptions on failure.
+        invalidation_id = invalidate_cf_paths(distribution_id, paths)
+        invalidation_results[distribution_id] = invalidation_id
+        log.info(
+            f"Invalidation request {invalidation_id} submitted for bucket {bucket} via distribution {distribution_id}"
+        )
+
+    return invalidation_results

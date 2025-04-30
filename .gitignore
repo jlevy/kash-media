@@ -4,6 +4,7 @@
 tmp/
 trash/
 attic/
+.envrc
 .kash/
 
 # Byte-compiled / optimized / DLL files
