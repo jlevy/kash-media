@@ -29,6 +29,7 @@ dependencies = [
     "pyrate-limiter>=3.7.0",
     "cachetools>=5.5.2",
     # Content tools:
+    "flowmark>=0.4.2",
     "chopdiff>=0.1.3",
     "simplemma>=1.1.2",
     # For printing. Note weasyprint has install dep issues on macos depending on the python version.

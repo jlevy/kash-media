@@ -1,6 +1,9 @@
 import logging
 import re
 
+import rich
+from ruamel.yaml.comments import LineCol
+
 log = logging.getLogger(__name__)
 
 
@@ -30,11 +33,17 @@ def check_endnotes(text: str) -> tuple[list[int], list[int]]:
     return sup_nums, end_nums
 
 
+_FOOTNOTE_INDENT = "    "
+
+
 def convert_endnotes_to_footnotes(text: str, strict: bool = True) -> str:
     """
-    Detects and converts endnotes to GitHub-style footnotes.
-    Raises ValueError if superscripts and list numbers don't match or are non-contiguous.
-    Returns original text if no <sup> tags are found.
+    Detects and converts docx-style endnotes (superscript footnotes marked with
+    `<sup>n</sup>` tags and an enumerated list of notes) to GitHub-style footnotes.
+
+    Returns original text if there are no endnotes (no <sup> tags are found).
+    Raises `ValueError` if superscripts are present but list numbers don't match
+    or are non-contiguous.
     """
 
     sup_nums, end_nums = check_endnotes(text)
@@ -54,49 +63,55 @@ def convert_endnotes_to_footnotes(text: str, strict: bool = True) -> str:
         )
 
     # Use the validated superscript numbers
-    unique = sup_nums
+    unique_sup_nums = sup_nums
 
     # 1) Split into lines, locate the first enumerated endnote
     lines = text.splitlines()
-    start = next((i for i, line in enumerate(lines) if re.match(r"\s*\d+\.\s+", line)), None)
+    start_line = next((i for i, line in enumerate(lines) if re.match(r"\s*\d+\.\s+", line)), None)
     # This check should technically be redundant now due to check_endnotes,
     # but kept for safety.
-    if start is None:
+    if start_line is None:
         raise ValueError(
             "Detected <sup> tags but no enumerated endnote block found."
         )  # pragma: no cover
 
     # 2) If the line immediately before is a header, preserve it; else no header
-    header_idx = start - 1
+    header_line = start_line - 1
     preserve_header = None
-    if header_idx >= 0 and lines[header_idx].lstrip().startswith("#"):
-        preserve_header = lines[header_idx]
+    if header_line >= 0 and lines[header_line].lstrip().startswith("#"):
+        preserve_header = lines[header_line]
 
     # 3) Parse the endnote block into a dict { number -> text }
     endnotes: dict[int, list[str]] = {}
     current = None
-    for line in lines[start:]:
+    for line in lines[start_line:]:
         m = re.match(r"\s*(\d+)\.\s+(.*)", line)
+        line_stripped = line.strip()
         if m:
             num = int(m.group(1))
             # Only parse notes corresponding to the detected unique numbers
-            if num in unique:
-                current = num
-                endnotes[num] = [m.group(2).rstrip()]
-        elif current is not None and line.strip():
-            # continuation line (indented text) -> append
-            if current in endnotes:  # Ensure current key exists
-                endnotes[current].append(line.strip())
-        elif not line.strip():  # TODO: Fix to handle multi-paragraph footnotes
+
+            current = num
+            if num in endnotes:
+                log.warning("Duplicate footnote %s: %r", num, line)
+            if num not in unique_sup_nums:
+                log.warning("Endnote %s didn't have a corresponding <sup> tag: %r", num, line)
+            endnotes[num] = [m.group(2).rstrip()]
+        elif current is not None and (not line_stripped or line.startswith(" ")):
+            # Continuation lines are empty or indented.
+            if current in endnotes and line_stripped:
+                endnotes[current].append(line_stripped)
+        elif not line.startswith(" "):
+            # A non-indented line so end current footnote.
             current = None
 
     # 4) Build the footnote definitions
-    footnote_defs = []
-    for n in unique:
+    footnote_defs: list[str] = []
+    for num in endnotes:
         # Handle cases where a note number might be missing due to parsing issues
         # though the initial check should prevent this.
-        body = "\n".join(endnotes.get(n, [""])).strip()
-        footnote_defs.append(f"[^{n}]: {body}")
+        body = f"\n{_FOOTNOTE_INDENT}".join(endnotes.get(num, [""])).strip()
+        footnote_defs.append(f"[^{num}]: {body}")
 
     # 5) Replace all <sup>n</sup> -> [^n]
     def _rep(m: re.Match[str]) -> str:
@@ -109,7 +124,7 @@ def convert_endnotes_to_footnotes(text: str, strict: bool = True) -> str:
 
     # 6) Re-slice out the original endnote block (and optional header)
     #    Indices (cut_start) are based on the *original* lines structure
-    cut_start = header_idx if preserve_header else start
+    cut_start = header_line if preserve_header else start_line
     # Use the modified_lines to build the new body
     new_body = "\n".join(modified_lines[:cut_start]).rstrip()
 
@@ -203,7 +218,14 @@ def test_endnotes_conversion():
 
     1. This is the first line.
        This is the second line.
+
+       This is the third line.
+
+    This is not in the footnote.
     """)
     converted_multiline = convert_endnotes_to_footnotes(md_multiline)
+    print(converted_multiline)
     assert "[^1]: This is the first line." in converted_multiline
-    assert "This is the second line." in converted_multiline
+    assert "    This is the second line." in converted_multiline
+    assert "    This is the third line." in converted_multiline
+    assert "This is not in the footnote." not in converted_multiline
