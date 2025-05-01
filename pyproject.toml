@@ -21,7 +21,7 @@ dynamic = ["version"]
 
 dependencies = [
     # Main kash and media deps:
-    "kash-shell>=0.3.9",
+    "kash-shell>=0.3.10",
     # Utilities:
     "rich>=14.0.0",
     "rich-argparse>=1.7.0",
@@ -68,7 +68,7 @@ dev = [
 
 [tool.uv.sources]
 # For bleeding edge:
-kash-shell = { git = "https://github.com/jlevy/kash-shell.git" }
+# kash-shell = { git = "https://github.com/jlevy/kash-shell.git" }
 # For local development:
 # kash-shell = { path = "../kash", editable = true }
 

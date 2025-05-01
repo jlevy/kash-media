@@ -1324,7 +1324,7 @@ requires-dist = [
     { name = "chopdiff", specifier = ">=0.1.3" },
     { name = "curl-cffi", specifier = ">=0.7.4" },
     { name = "flowmark", specifier = ">=0.4.2" },
-    { name = "kash-shell", git = "https://github.com/jlevy/kash-shell.git" },
+    { name = "kash-shell", specifier = ">=0.3.10" },
     { name = "markitdown", extras = ["all"], specifier = ">=0.1.1" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
     { name = "pandas", specifier = ">=2.2.3" },
@@ -1356,8 +1356,8 @@ dev = [
 
 [[package]]
 name = "kash-shell"
-version = "0.3.10.dev52+c72f959"
-source = { git = "https://github.com/jlevy/kash-shell.git#c72f9590277c1c09cd6b97631b54792d7eae2287" }
+version = "0.3.10"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
     { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
@@ -1410,6 +1410,10 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "uvicorn" },
     { name = "xonsh" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/86/18/58907054734b0b92fa4783b3bf2058f6d29b09fe7b27a67336a80bdc183d/kash_shell-0.3.10.tar.gz", hash = "sha256:82c5da2dd5c392b42e7ac11e94a89b6e308e2754da9ddeca9025a9a64a5725e2", size = 502464 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2a/d5/a698e79133abdf03fb1a5c1f094bdb5975591015c4b82f3a00e9b0e086cc/kash_shell-0.3.10-py3-none-any.whl", hash = "sha256:5eed404e6d959ea29b3c5b6cfd3658c53954a2b56bd8625f0d4eea3d477429f6", size = 468710 },
 ]
 
 [[package]]
@@ -3662,11 +3666,11 @@ wheels = [
 
 [[package]]
 name = "yt-dlp"
-version = "2025.3.31"
+version = "2025.4.30"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a2/11/333d16f88b1515d4c601e1dfbf1028e6798f0b2a8ff1dc5aaa7b797aa9e8/yt_dlp-2025.3.31.tar.gz", hash = "sha256:1bfe0e660d1a70a09e27b2d58f92e30b1e2e362cc487829f2f824346ae49fb91", size = 2967466 }
+sdist = { url = "https://files.pythonhosted.org/packages/75/ca/1d1a33dec2107463f59bc4b448fcf43718d86a36b6150e8a0cfd1a96a893/yt_dlp-2025.4.30.tar.gz", hash = "sha256:d01367d0c3ae94e35cb1e2eccb7a7c70e181c4ca448f4ee2374f26489d263603", size = 2981094 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a8/bf/7b0affb8f163376309696cfd1c677818fa0969fbb9d88225087208799afe/yt_dlp-2025.3.31-py3-none-any.whl", hash = "sha256:8ecb3aa218a3bebe431119f513a8972b9b9d992edf67168c00ab92329a03baec", size = 3226021 },
+    { url = "https://files.pythonhosted.org/packages/ea/18/bbccb18661a853c3db947152439229b9bf686fe0ab2cc7848ab3a24f2ad2/yt_dlp-2025.4.30-py3-none-any.whl", hash = "sha256:53cd82bf13f12a1fe9c564b0004e001156b153c9247fa3cef14d1400ab359150", size = 3239476 },
 ]
 
 [[package]]
