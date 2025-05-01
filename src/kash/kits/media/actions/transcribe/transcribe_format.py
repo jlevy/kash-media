@@ -2,7 +2,7 @@ from kash.actions.core.strip_html import strip_html
 from kash.config.logger import get_logger
 from kash.exec import kash_action
 from kash.exec.preconditions import is_audio_resource, is_url_item, is_video_resource
-from kash.kits.media.actions.text.break_into_paragraphs import break_into_paragraphs
+from kash.kits.docs.actions.text.break_into_paragraphs import break_into_paragraphs
 from kash.kits.media.actions.transcribe.backfill_timestamps import backfill_timestamps
 from kash.kits.media.actions.transcribe.identify_speakers import identify_speakers
 from kash.kits.media.actions.transcribe.transcribe import transcribe

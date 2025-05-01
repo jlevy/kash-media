@@ -7,10 +7,7 @@ import_and_register(
     Path(__file__).parent,
     [
         "actions",
-        "concepts",
-        "docs",
         "media_services",
         "video",
-        "wiki",
     ],
 )
