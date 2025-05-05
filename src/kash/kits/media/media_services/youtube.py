@@ -31,46 +31,65 @@ class YouTube(MediaService):
     @override
     def canonicalize_and_type(self, url: Url) -> tuple[Url | None, MediaUrlType | None]:
         parsed_url = urlparse(url)
+        path_parts = parsed_url.path.strip("/").split("/")
+
         if parsed_url.hostname == "youtu.be":
             video_id = self.get_media_id(url)
             if video_id:
                 return Url(f"https://www.youtube.com/watch?v={video_id}"), MediaUrlType.video
         elif parsed_url.hostname in ("www.youtube.com", "youtube.com", "m.youtube.com"):
-            # Check for channel URLs:
+            # Check for channel URLs first, as they have distinct paths
             if (
-                "/channel/" in parsed_url.path
-                or "/c/" in parsed_url.path
-                or "/user/" in parsed_url.path
+                len(path_parts) > 0
+                and path_parts[0] in ("channel", "c", "user")
                 or parsed_url.path.startswith("/@")
             ):
-                # It's already a canonical channel URL.
+                # It's already a canonical channel URL or a recognized format.
+                # TODO: Consider canonicalizing /c/ and /user/ to /@handle if possible?
                 return url, MediaUrlType.channel
 
             query = parse_qs(parsed_url.query)
 
-            # Check for playlist URLs:
-            if "/playlist" in parsed_url.path:
+            # Check for playlist URLs
+            if len(path_parts) > 0 and path_parts[0] == "playlist":
                 list_id = query.get("list", [""])[0]
-                return (
-                    Url(f"https://www.youtube.com/playlist?list={list_id}"),
-                    MediaUrlType.playlist,
-                )
+                if list_id:
+                    return (
+                        Url(f"https://www.youtube.com/playlist?list={list_id}"),
+                        MediaUrlType.playlist,
+                    )
 
-            # Check for video URLs:
-            video_id = self.get_media_id(url)
-            if video_id:
+            # Check for /live/ and /shorts/ paths
+            if len(path_parts) == 2 and path_parts[0] in ("live", "shorts"):
+                video_id = path_parts[1]
+                if VIDEO_ID_PATTERN.match(video_id):
+                    return Url(f"https://www.youtube.com/watch?v={video_id}"), MediaUrlType.video
+
+            # Fallback to checking ?v= query parameter for standard video URLs
+            video_id = query.get("v", [""])[0]
+            if video_id and VIDEO_ID_PATTERN.match(video_id):
                 return Url(f"https://www.youtube.com/watch?v={video_id}"), MediaUrlType.video
 
+        # If none of the above matched
         return None, None
 
     @override
     def get_media_id(self, url: Url) -> str | None:
         parsed_url = urlparse(url)
+        path_parts = parsed_url.path.strip("/").split("/")
+
         if parsed_url.hostname == "youtu.be":
             video_id = parsed_url.path[1:]
             if VIDEO_ID_PATTERN.match(video_id):
                 return video_id
         elif parsed_url.hostname in ("www.youtube.com", "youtube.com", "m.youtube.com"):
+            # Check paths first
+            if len(path_parts) == 2 and path_parts[0] in ("live", "shorts"):
+                video_id = path_parts[1]
+                if VIDEO_ID_PATTERN.match(video_id):
+                    return video_id
+
+            # Check query parameter
             query = parse_qs(parsed_url.query)
             video_id = query.get("v", [""])[0]
             if video_id and VIDEO_ID_PATTERN.match(video_id):
@@ -223,26 +242,96 @@ def best_thumbnail(data: dict[str, Any]) -> Url | None:
 def test_canonicalize_youtube():
     youtube = YouTube()
 
-    def assert_canon(url: str, canon_url: str):
-        assert youtube.canonicalize(Url(url)) == Url(canon_url)
+    def assert_canon(url: str, expected_canon_url: str | None, expected_type: MediaUrlType | None):
+        canon_url, url_type = youtube.canonicalize_and_type(Url(url))
+        assert canon_url == (Url(expected_canon_url) if expected_canon_url else None)
+        assert url_type == expected_type
+        # Also test canonicalize convenience method
+        if expected_canon_url:
+            assert youtube.canonicalize(Url(url)) == Url(expected_canon_url)
+        else:
+            assert youtube.canonicalize(Url(url)) is None
 
-    assert_canon("https://youtu.be/12345678901", "https://www.youtube.com/watch?v=12345678901")
-
+    # Video URLs
     assert_canon(
-        "https://www.youtube.com/watch?v=12345678901", "https://www.youtube.com/watch?v=12345678901"
+        "https://youtu.be/dQw4w9WgXcQ",
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        MediaUrlType.video,
     )
-
+    assert_canon(
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        MediaUrlType.video,
+    )
+    assert_canon(
+        "https://m.youtube.com/watch?v=dQw4w9WgXcQ&feature=share",
+        "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        MediaUrlType.video,
+    )
     assert_canon(
         "https://www.youtube.com/watch?v=_5y0AalUDh4&list=PL9XbNw3iJu1zKJRyV3Jz3rqlFV1XJfvNv&index=12",
         "https://www.youtube.com/watch?v=_5y0AalUDh4",
+        MediaUrlType.video,
     )
 
+    # Live URLs
+    assert_canon(
+        "https://www.youtube.com/live/XVwpL_cAvrw?si=mgv-xnhaO6UJLxwb",
+        "https://www.youtube.com/watch?v=XVwpL_cAvrw",
+        MediaUrlType.video,
+    )
+
+    # Shorts URLs
+    assert_canon(
+        "https://www.youtube.com/shorts/abcdefghijk",  # Example valid ID format
+        "https://www.youtube.com/watch?v=abcdefghijk",
+        MediaUrlType.video,
+    )
+    assert_canon(
+        "https://youtube.com/shorts/lmnopqrs_tu",  # Example valid ID format (11 chars)
+        "https://www.youtube.com/watch?v=lmnopqrs_tu",
+        MediaUrlType.video,
+    )
+
+    # Channel URLs
     assert_canon(
         "https://www.youtube.com/@hubermanlab",
         "https://www.youtube.com/@hubermanlab",
+        MediaUrlType.channel,
+    )
+    assert_canon(
+        "https://www.youtube.com/c/inanutshell",
+        "https://www.youtube.com/c/inanutshell",
+        MediaUrlType.channel,
+    )
+    assert_canon(
+        "https://www.youtube.com/channel/UCXuqSBlHAE6Xw-yeJA0Tunw",
+        "https://www.youtube.com/channel/UCXuqSBlHAE6Xw-yeJA0Tunw",
+        MediaUrlType.channel,
+    )
+    assert_canon(
+        "https://www.youtube.com/user/Vsauce",
+        "https://www.youtube.com/user/Vsauce",
+        MediaUrlType.channel,
     )
 
+    # Playlist URLs
     assert_canon(
         "https://youtube.com/playlist?list=PLPNW_gerXa4N_PVVoq0Za03YKASSGCazr&si=9IVO8p-ZwmMLI18F",
         "https://www.youtube.com/playlist?list=PLPNW_gerXa4N_PVVoq0Za03YKASSGCazr",
+        MediaUrlType.playlist,
     )
+    assert_canon(
+        "https://www.youtube.com/playlist?list=PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo",
+        "https://www.youtube.com/playlist?list=PLFsQleAWXsj_4yDeebiIADdH5FMayBiJo",
+        MediaUrlType.playlist,
+    )
+
+    # Invalid/Unrecognized URLs
+    assert_canon("https://example.com", None, None)
+    assert_canon("https://www.youtube.com/", None, None)
+    assert_canon(
+        "https://www.youtube.com/feed/subscriptions", None, None
+    )  # Example non-content URL
+    assert_canon("https://youtu.be/", None, None)  # Missing ID
+    assert_canon("https://www.youtube.com/watch?list=abc", None, None)  # Missing v= parameter
