@@ -21,7 +21,8 @@ dynamic = ["version"]
 
 dependencies = [
     # Main kash and kash kits:
-    "kash-docs>=0.1.0",
+    "kash-docs>=0.1.2",
+    "kash-shell>=0.3.11",
     # Utilities:
     "typing-extensions>=4.11.1",
     # Content tools:
@@ -49,7 +50,7 @@ dev = [
 
 [tool.uv.sources]
 # For bleeding edge:
-kash-docs = { git = "https://github.com/jlevy/kash-docs.git" }
+# kash-docs = { git = "https://github.com/jlevy/kash-docs.git" }
 # For local development:
 # kash-docs = { path = "../kash-docs", editable = true }
 # kash-shell = { path = "../kash", editable = true }

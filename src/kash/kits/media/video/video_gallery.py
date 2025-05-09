@@ -11,8 +11,7 @@ from kash.model.items_model import Item, ItemType
 from kash.utils.common.type_utils import as_dataclass
 from kash.utils.errors import InvalidInput
 from kash.utils.file_utils.file_formats_model import Format
-from kash.web_gen import base_templates_dir
-from kash.web_gen.template_render import render_web_template
+from kash.web_gen.template_render import additional_template_dirs, render_web_template
 from kash.workspaces.source_items import find_upstream_item
 
 log = get_logger(__name__)
@@ -77,14 +76,13 @@ def video_gallery_generate(config_item: Item) -> str:
     config = config_item.read_as_config()
     video_gallery = as_dataclass(config, VideoGallery)  # Checks the format.
 
-    content = render_web_template(
-        templates_dir,
-        "youtube_gallery.html.jinja",
-        asdict(video_gallery),
-    )
+    with additional_template_dirs(templates_dir):
+        content = render_web_template(
+            "youtube_gallery.html.jinja",
+            asdict(video_gallery),
+        )
 
-    return render_web_template(
-        base_templates_dir,
-        "base_webpage.html.jinja",
-        {"title": video_gallery.title, "content": content},
-    )
+        return render_web_template(
+            "base_webpage.html.jinja",
+            {"title": video_gallery.title, "content": content},
+        )
