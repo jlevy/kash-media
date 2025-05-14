@@ -3,7 +3,7 @@ from strif import replace_multiple
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action
-from kash.exec.preconditions import has_html_body, has_text_body
+from kash.exec.preconditions import has_html_body, has_simple_text_body
 from kash.model import Item, ItemType
 from kash.utils.errors import InvalidInput
 
@@ -11,7 +11,7 @@ log = get_logger(__name__)
 
 
 @kash_action(
-    precondition=has_html_body | has_text_body,
+    precondition=has_html_body | has_simple_text_body,
 )
 def remove_speaker_labels(item: Item) -> Item:
     """

@@ -6,7 +6,7 @@ from strif import Insertion, insert_multiple
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action, kash_precondition
-from kash.exec.preconditions import has_timestamps, is_text_doc
+from kash.exec.preconditions import has_simple_text_body, has_timestamps
 from kash.kits.media.video.image_similarity import filter_similar_frames
 from kash.kits.media.video.video_frames import capture_frames
 from kash.model import Format, Item, ItemType, Param
@@ -31,7 +31,7 @@ def has_frame_captures(item: Item) -> bool:
 
 
 @kash_action(
-    precondition=is_text_doc & has_timestamps & ~has_frame_captures,
+    precondition=has_simple_text_body & has_timestamps & ~has_frame_captures,
     params=(
         Param(
             "threshold",

@@ -15,7 +15,7 @@ from chopdiff.html import ContentNotFound, TimestampExtractor
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action
-from kash.exec.preconditions import has_timestamps, is_text_doc
+from kash.exec.preconditions import has_simple_text_body, has_timestamps
 from kash.media_base.timestamp_citations import add_citation_to_text, format_timestamp_citation
 from kash.model import Format, Item, ItemType, common_params
 from kash.utils.common.format_utils import fmt_loc
@@ -27,7 +27,7 @@ log = get_logger(__name__)
 
 
 @kash_action(
-    precondition=is_text_doc & ~has_timestamps,
+    precondition=has_simple_text_body & ~has_timestamps,
     params=common_params("chunk_unit"),
 )
 def backfill_timestamps(item: Item, chunk_unit: TextUnit = TextUnit.paragraphs) -> Item:

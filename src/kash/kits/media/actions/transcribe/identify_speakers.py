@@ -5,7 +5,7 @@ from strif import StringTemplate, replace_multiple
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action
-from kash.exec.preconditions import has_html_body, has_text_body
+from kash.exec.preconditions import has_html_body, has_simple_text_body
 from kash.kits.media.video.speaker_labels import find_speaker_labels
 from kash.llm_utils import LLM, Message, MessageTemplate
 from kash.llm_utils.fuzzy_parsing import fuzzy_parse_json
@@ -18,7 +18,7 @@ log = get_logger(__name__)
 
 
 @kash_action(
-    precondition=has_text_body | has_html_body,
+    precondition=has_simple_text_body | has_html_body,
 )
 def identify_speakers(item: Item) -> Item:
     """
