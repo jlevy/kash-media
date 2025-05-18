@@ -1,5 +1,5 @@
 from kash.exec import kash_action
-from kash.exec.preconditions import is_audio_resource, is_url_item, is_video_resource
+from kash.exec.preconditions import is_audio_resource, is_url_resource, is_video_resource
 from kash.kits.docs.actions.text.add_description import add_description
 from kash.kits.docs.actions.text.add_summary_bullets import add_summary_bullets
 from kash.kits.docs.actions.text.caption_paras import caption_paras
@@ -10,7 +10,7 @@ from kash.model import Item, common_params
 
 
 @kash_action(
-    precondition=is_url_item | is_audio_resource | is_video_resource,
+    precondition=is_url_resource | is_audio_resource | is_video_resource,
     params=common_params("language"),
     mcp_tool=True,
 )

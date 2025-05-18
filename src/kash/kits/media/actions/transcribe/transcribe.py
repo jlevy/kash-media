@@ -3,7 +3,7 @@ from chopdiff.divs import parse_divs
 import kash.kits.docs.doc_formats  # noqa: F401  # Ensure all media tools are available.
 from kash.config.logger import get_logger
 from kash.exec import kash_action
-from kash.exec.preconditions import is_audio_resource, is_url_item, is_video_resource
+from kash.exec.preconditions import is_audio_resource, is_url_resource, is_video_resource
 from kash.media_base.media_tools import cache_and_transcribe
 from kash.model import FileExt, Format, Item, ItemType, common_params
 from kash.utils.common.type_utils import not_none
@@ -14,7 +14,7 @@ log = get_logger(__name__)
 
 
 @kash_action(
-    precondition=is_url_item | is_audio_resource | is_video_resource,
+    precondition=is_url_resource | is_audio_resource | is_video_resource,
     params=common_params("language"),
     mcp_tool=True,
 )

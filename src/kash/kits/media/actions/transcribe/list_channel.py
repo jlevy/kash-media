@@ -1,6 +1,6 @@
 from kash.config.logger import get_logger
 from kash.exec import kash_action
-from kash.exec.preconditions import is_url_item
+from kash.exec.preconditions import is_url_resource
 from kash.media_base.media_services import canonicalize_media_url, list_channel_items
 from kash.model import NO_ARGS, ActionInput, ActionResult, Item
 from kash.utils.errors import InvalidInput
@@ -10,7 +10,7 @@ log = get_logger(__name__)
 
 @kash_action(
     expected_args=NO_ARGS,
-    precondition=is_url_item,
+    precondition=is_url_resource,
 )
 def list_channel(input: ActionInput) -> ActionResult:
     """
