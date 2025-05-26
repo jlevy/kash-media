@@ -51,8 +51,8 @@ def video_gallery_config(items: list[Item]) -> Item:
 
         video_info = VideoInfo(
             youtube_id=youtube_id,
-            title=clean_heading(item.abbrev_title()),
-            description=item.abbrev_description(),
+            title=clean_heading(item.pick_title()),
+            description=item.pick_description(),
             topics=[],  # TODO
         )
         videos.append(video_info)
