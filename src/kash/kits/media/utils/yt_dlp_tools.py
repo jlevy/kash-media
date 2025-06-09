@@ -11,6 +11,7 @@ from frontmatter_format import to_yaml_string
 
 from kash.config.logger import get_logger
 from kash.utils.common.url import Url
+from kash.utils.common.url_slice import Slice
 from kash.utils.errors import ApiResultError
 from kash.utils.file_utils.file_formats_model import MediaType
 
@@ -44,7 +45,10 @@ def ydl_extract_info(url: Url) -> dict[str, Any]:
 
 
 def ydl_download_media(
-    url: Url, target_dir: Path | None = None, media_types: list[MediaType] | None = None
+    url: Url,
+    target_dir: Path | None = None,
+    media_types: list[MediaType] | None = None,
+    slice: Slice | None = None,
 ) -> dict[MediaType, Path]:
     """
     Download and convert to mp3 and mp4 using yt_dlp, which is generally the best
@@ -93,6 +97,31 @@ def ydl_download_media(
                 },
             ],
         }
+
+    # Add time slicing support if slice is provided
+    if slice:
+        # Tell yt-dlp the exact seconds we want
+        ydl_opts["download_ranges"] = yt_dlp.download_range_func(
+            None, [(slice.start_time, slice.end_time)]
+        )
+        ydl_opts["force_keyframes_at_cuts"] = True
+
+        # Let yt-dlp choose the best format automatically
+        # Just exclude problematic HLS formats
+        ydl_opts["format"] = "best[protocol!=m3u8][protocol!=m3u8_native]/best"
+
+        log.info("Slice requested: %s", (slice.start_time, slice.end_time))
+
+        # This could be more robust but was triggering ffmpeg errors.
+        # ydl_opts["format"] = (
+        #     # 1. DASH video in fragments + any best audio
+        #     "bestvideo[protocol*=http_dash_segments]+bestaudio/"
+        #     # 2. otherwise: segmented HLS (yt-dlp will use its native downloader)
+        #     "(bv*+ba/best)[protocol*=m3u8]/"
+        #     # 3. last resort: whatever is “best” (could be progressive MP4)
+        #     "best"
+        # )
+        # ydl_opts["hls_prefer_native"] = True
 
     # Use our logger.
     ydl_opts["logger"] = log  # pylance: ignore

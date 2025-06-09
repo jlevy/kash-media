@@ -1,7 +1,6 @@
 from chopdiff.divs import parse_divs
 from chopdiff.docs import search_tokens
-from chopdiff.html import TimestampExtractor
-from chopdiff.html.html_in_md import html_img, md_para
+from chopdiff.html import TimestampExtractor, html_img, md_para
 from strif import Insertion, insert_multiple
 
 from kash.config.logger import get_logger
@@ -63,8 +62,8 @@ def insert_frame_captures(item: Item, threshold: float = 0.6) -> Item:
         f"Found {len(timestamp_matches)} timestamps in the document, {parse_divs(item.body).size_summary()}."
     )
 
-    # Extract frame captures.
-    target_dir = current_ws().base_dir / "assets"
+    # Extract frame captures, and put them in the workspace's assets directory.
+    target_dir = current_ws().assets_dir
     timestamps = [timestamp for timestamp, _index, _offset in timestamp_matches]
     frame_paths = capture_frames(video_path, timestamps, target_dir, prefix=item.slug_name())
 

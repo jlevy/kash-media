@@ -19,6 +19,7 @@ def capture_frames(
 ) -> list[Path]:
     """
     Capture frames at given timestamps and save them as JPG images using the provided pattern.
+    Returns a list of paths to the captured frames, which will be within the target directory.
     """
     if not Path(video_file).is_file():
         raise FileNotFound(f"Video file not found: {video_file}")

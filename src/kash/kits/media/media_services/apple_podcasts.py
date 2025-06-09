@@ -13,6 +13,7 @@ from kash.kits.media.utils.yt_dlp_tools import ydl_download_media, ydl_extract_i
 from kash.model.media_model import SERVICE_APPLE_PODCASTS, MediaMetadata, MediaService, MediaUrlType
 from kash.utils.common.type_utils import not_none
 from kash.utils.common.url import Url
+from kash.utils.common.url_slice import Slice
 from kash.utils.errors import ApiResultError
 from kash.utils.file_utils.file_formats_model import MediaType
 
@@ -88,10 +89,15 @@ class ApplePodcasts(MediaService):
 
     @override
     def download_media(
-        self, url: Url, target_dir: Path, media_types: list[MediaType] | None = None
+        self,
+        url: Url,
+        target_dir: Path,
+        *,
+        media_types: list[MediaType] | None = None,
+        slice: Slice | None = None,
     ) -> dict[MediaType, Path]:
         url = not_none(self.canonicalize(url), "Not a recognized Apple Podcasts URL")
-        return ydl_download_media(url, target_dir, media_types)
+        return ydl_download_media(url, target_dir, media_types=media_types, slice=slice)
 
     def _extract_info(self, url: Url) -> dict[str, Any]:
         url = not_none(self.canonicalize(url), "Not a recognized Apple Podcasts URL")
