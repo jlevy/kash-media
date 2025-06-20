@@ -39,8 +39,8 @@ classifiers = [
 
 dependencies = [
 # Main kash and kash kits:
-    "kash-docs>=0.1.2",
-    "kash-shell>=0.3.11",
+    "kash-docs[full]>=0.1.9",
+    "kash-shell>=0.3.18",
     # Utilities:
     "typing-extensions>=4.11.1",
     # Content tools:
