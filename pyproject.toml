@@ -39,8 +39,7 @@ classifiers = [
 
 dependencies = [
 # Main kash and kash kits:
-    "kash-docs[full]>=0.1.9",
-    "kash-shell>=0.3.18",
+    "kash-docs[full]>=0.1.11",
     # Utilities:
     "typing-extensions>=4.11.1",
     # Content tools:
@@ -72,8 +71,8 @@ dev = [
 
 [tool.uv.sources]
 # For bleeding edge:
-kash-docs = { git = "https://github.com/jlevy/kash-docs.git" }
-kash-shell = { git = "https://github.com/jlevy/kash.git" }
+# kash-docs = { git = "https://github.com/jlevy/kash-docs.git" }
+# kash-shell = { git = "https://github.com/jlevy/kash.git" }
 # For local development:
 # kash-docs = { path = "../kash-docs", editable = true }
 # kash-shell = { path = "../kash", editable = true }
