@@ -62,7 +62,7 @@ def video_gallery_config(items: list[Item]) -> Item:
 
     config_item = Item(
         title=f"Config for {title}",
-        type=ItemType.config,
+        type=ItemType.data,
         format=Format.yaml,
         body=to_yaml_string(asdict(gallery)),
     )
@@ -73,7 +73,7 @@ def video_gallery_generate(config_item: Item) -> str:
     """
     Generate a video gallery web page using the supplied config.
     """
-    config = config_item.read_as_config()
+    config = config_item.read_as_data()
     video_gallery = as_dataclass(config, VideoGallery)  # Checks the format.
 
     with additional_template_dirs(templates_dir):

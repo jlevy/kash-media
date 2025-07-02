@@ -39,7 +39,7 @@ classifiers = [
 
 dependencies = [
 # Main kash and kash kits:
-    "kash-docs[full]>=0.1.11",
+    "kash-docs[full]>=0.1.12",
     # Utilities:
     "typing-extensions>=4.11.1",
     # Content tools:
