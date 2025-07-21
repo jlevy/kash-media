@@ -1383,8 +1383,8 @@ wheels = [
 
 [[package]]
 name = "kash-docs"
-version = "0.1.13"
-source = { git = "https://github.com/jlevy/kash-docs.git#aa27978a5225a30a33fe216f765652f9f68cbfef" }
+version = "0.1.14.dev1+f2bd482"
+source = { git = "https://github.com/jlevy/kash-docs.git#f2bd48242293712f298ab45460090236ab73bac8" }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "boto3" },
@@ -1455,7 +1455,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "basedpyright", specifier = ">=1.28.2" },
+    { name = "basedpyright", specifier = ">=1.31.0" },
     { name = "clideps", specifier = ">=0.1.1" },
     { name = "codespell", specifier = ">=2.4.1" },
     { name = "funlog", specifier = ">=0.2.0" },
@@ -1467,8 +1467,8 @@ dev = [
 
 [[package]]
 name = "kash-shell"
-version = "0.3.26.dev10+64d22df"
-source = { git = "https://github.com/jlevy/kash.git#64d22df482bf331f6d14d8e3900c6d237187ec09" }
+version = "0.3.26.dev10+f3defee"
+source = { git = "https://github.com/jlevy/kash.git#f3defeed6779beefe89c66dd7149537fae05fc46" }
 dependencies = [
     { name = "aiolimiter" },
     { name = "anyio" },
@@ -1511,6 +1511,7 @@ dependencies = [
     { name = "python-dotenv" },
     { name = "python-magic", marker = "sys_platform == 'darwin' or sys_platform == 'linux'" },
     { name = "python-magic-bin", marker = "sys_platform == 'win32'" },
+    { name = "questionary" },
     { name = "readabilipy" },
     { name = "regex" },
     { name = "rich" },
