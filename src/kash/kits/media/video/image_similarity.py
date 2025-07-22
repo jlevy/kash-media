@@ -41,7 +41,7 @@ def filter_similar_frames(frame_paths: list[Path], threshold: float = 0.95) -> l
         if curr_frame is None:
             continue
 
-        if not prev_frame or not frames_are_similar(curr_frame, prev_frame, threshold):
+        if prev_frame is None or not frames_are_similar(curr_frame, prev_frame, threshold):
             unique_indices.append(i)
 
     return unique_indices
