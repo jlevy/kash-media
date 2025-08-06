@@ -14,12 +14,14 @@ def capture_frames(
     video_file: Path,
     timestamps: list[float],
     target_dir: Path,
+    *,
     prefix: str = "frame_",
     target_pattern: str = "{prefix}_{frame_number:04d}.jpg",
 ) -> list[Path]:
     """
-    Capture frames at given timestamps and save them as JPG images using the provided pattern.
-    Returns a list of paths to the captured frames, which will be within the target directory.
+    Capture frames at given timestamps and save them as JPG images using the
+    provided pattern. Returns a list of paths to the captured frames, which
+    will be relative to the target directory.
     """
     if not Path(video_file).is_file():
         raise FileNotFound(f"Video file not found: {video_file}")
@@ -47,6 +49,7 @@ def capture_frames(
             fps,
         )
 
+        log.message("Saving captured frames from: %s", fmt_loc(video_file))
         for i, timestamp in enumerate(timestamps):
             frame_number = int(fps * timestamp)
             if frame_number >= total_frames:
@@ -57,15 +60,15 @@ def capture_frames(
 
             success, frame = video.read()
             if success:
-                target_path = target_dir / target_template.format(prefix=prefix, frame_number=i)
+                rel_path = target_template.format(prefix=prefix, frame_number=i)
+                target_path = target_dir / rel_path
                 with atomic_output_file(
                     target_path, make_parents=True, tmp_suffix=target_path.suffix
                 ) as tmp_path:
                     cv2.imwrite(str(tmp_path), frame)
-                log.message(
-                    "Saved captured frame: %s -> %s", fmt_loc(video_file), fmt_loc(target_path)
-                )
-                captured_frames.append(target_path)
+                captured_frames.append(rel_path)
+                log.message("Saved frame: %s", fmt_loc(locator=target_path))
+
             else:
                 log.error(f"Failed to read frame {frame_number} at timestamp {timestamp}s")
                 raise ContentError(

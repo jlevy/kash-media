@@ -32,6 +32,11 @@ def filter_similar_frames(frame_paths: list[Path], threshold: float = 0.95) -> l
     if not frame_paths:
         return []
 
+    # Sanity check. CV2 doesn't raise exceptions but just gives cryptic errors if files don't exist.
+    missing_paths = [p for p in frame_paths if not p.exists()]
+    if missing_paths:
+        raise FileNotFoundError(f"Frame paths not found: {missing_paths}")
+
     unique_indices = [0]  # Always keep first frame
 
     for i in range(1, len(frame_paths)):
