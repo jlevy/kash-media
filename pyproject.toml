@@ -41,6 +41,7 @@ dependencies = [
 # Main kash and kash kits:
     "kash-docs[full]>=0.1.15",
     "kash-shell>=0.3.27",
+    "sidematter-format>=0.0.3",
     # Utilities:
     "typing-extensions>=4.11.1",
     # Content tools:
