@@ -2,6 +2,7 @@ from kash.exec import kash_action
 from kash.exec.preconditions import is_audio_resource, is_url_resource, is_video_resource
 from kash.kits.docs.actions.text.add_description import add_description
 from kash.kits.docs.actions.text.add_summary_bullets import add_summary_bullets
+from kash.kits.docs.actions.text.analyze_key_claims import analyze_key_claims
 from kash.kits.docs.actions.text.insert_section_headings import insert_section_headings
 from kash.kits.docs.actions.text.research_paras import research_paras
 from kash.kits.media.actions.transcribe.insert_frame_captures import insert_frame_captures
@@ -30,7 +31,9 @@ def transcribe_annotate(item: Item, language: str = "en") -> Item:
 
     with_summary = add_summary_bullets(with_research)
 
-    with_description = add_description(with_summary)
+    with_claims_analysis = analyze_key_claims(with_summary)
+
+    with_description = add_description(with_claims_analysis)
 
     with_frames = insert_frame_captures(with_description)
 

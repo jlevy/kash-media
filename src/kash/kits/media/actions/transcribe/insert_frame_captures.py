@@ -53,7 +53,7 @@ def insert_frame_captures(item: Item, threshold: float = SIM_THRESHOLD) -> Item:
         raise InvalidInput("Item has no body")
 
     # Create output item and get the assets directory for the frame captures.
-    output_item = item.preassembled_copy(type=ItemType.doc, format=Format.md_html)
+    output_item = item.derived_copy(type=ItemType.doc, format=Format.md_html)
     ws = current_ws()
     target_path = ws.assign_store_path(output_item)
     abs_assets_dir = Sidematter(target_path).assets_dir

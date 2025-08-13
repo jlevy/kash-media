@@ -78,6 +78,9 @@ kash-shell = { git = "https://github.com/jlevy/kash.git" }
 # For local development:
 # kash-docs = { path = "../kash-docs", editable = true }
 # kash-shell = { path = "../kash", editable = true }
+# sidematter-format = { path = "../sidematter-format", editable = true }
+# frontmatter-format = { path = "../frontmatter-format", editable = true }
+
 
 
 [project.scripts]
@@ -118,7 +121,7 @@ packages = ["src/kash"]
 [tool.uv-dynamic-versioning]
 vcs = "git"
 style = "pep440"
-bump = "true"
+bump = true
 
 
 # ---- Settings ----
