@@ -13,7 +13,9 @@ authors = [
 ]
 readme = "README.md"
 license = "AGPL-3.0-or-later"
-requires-python = ">=3.11,<4.0"
+# Have seen some hard crashes on 3.13.6 on macOS (possibly related to joblib/loky)
+# but it seems they are fixed in 3.13.7.
+requires-python = ">=3.13.7,<4.0"
 dynamic = ["version"]
 
 # https://pypi.org/classifiers/
@@ -38,7 +40,7 @@ classifiers = [
 # ---- Main dependencies ----
 
 dependencies = [
-# Main kash and kash kits:
+    # Main kash and kash kits:
     "kash-docs[full]==0.1.19",
     "sidematter-format>=0.0.3",
     # Utilities:
@@ -72,8 +74,8 @@ dev = [
 
 [tool.uv.sources]
 # For bleeding edge:
-# kash-docs = { git = "https://github.com/jlevy/kash-docs.git" }
-# kash-shell = { git = "https://github.com/jlevy/kash.git" }
+kash-docs = { git = "https://github.com/jlevy/kash-docs.git" }
+kash-shell = { git = "https://github.com/jlevy/kash.git" }
 # For local development:
 # kash-docs = { path = "../kash-docs", editable = true }
 # kash-shell = { path = "../kash", editable = true }

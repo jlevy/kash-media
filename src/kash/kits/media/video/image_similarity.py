@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import cv2
 from numpy.typing import NDArray
@@ -44,6 +44,9 @@ def filter_similar_frames(frame_paths: list[Path], threshold: float = 0.95) -> l
     for i in range(1, len(frame_paths)):
         curr_frame = cv2.imread(str(frame_paths[i]))
         prev_frame = cv2.imread(str(frame_paths[i - 1]))
+
+        if curr_frame is None or prev_frame is None:
+            raise RuntimeError(f"Failed to read frames: {frame_paths[i - 1]} or {frame_paths[i]}")
 
         if not frames_are_similar(curr_frame, prev_frame, threshold):
             unique_indices.append(i)

@@ -1,11 +1,10 @@
 from pathlib import Path
 
 import cv2
-from strif import StringTemplate, atomic_output_file
-
 from kash.config.logger import get_logger
 from kash.utils.common.format_utils import fmt_loc
 from kash.utils.errors import ContentError, FileNotFound
+from strif import StringTemplate, atomic_output_file
 
 log = get_logger(__name__)
 

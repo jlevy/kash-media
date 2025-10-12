@@ -1,5 +1,4 @@
 from chopdiff.html import TagMatch, html_extract_attribute_value, html_find_tag
-
 from kash.exec.precondition_registry import kash_precondition
 from kash.media_base.timestamp_citations import DATA_SPEAKER_ID
 from kash.model.items_model import Item

@@ -1,9 +1,7 @@
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 from urllib.parse import urlparse
-
-from typing_extensions import override
 
 from kash.config.logger import get_logger
 from kash.kits.media.utils.yt_dlp_tools import parse_date, ydl_download_media, ydl_extract_info

@@ -1,10 +1,9 @@
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 from urllib.parse import parse_qs, urlparse
 
 from frontmatter_format import to_yaml_string
-from typing_extensions import override
 from yt_dlp.utils import DownloadError
 
 from kash.config.logger import get_logger
