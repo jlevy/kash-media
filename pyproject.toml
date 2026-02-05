@@ -16,7 +16,7 @@ license = "AGPL-3.0-or-later"
 # Have seen some hard crashes on 3.13.6 on macOS (possibly related to joblib/loky)
 # but it seems they are fixed in 3.13.7.
 # TODO: And onnxruntime isn't working on 3.14.0 yet.
-requires-python = ">=3.13.7,<3.14.0"
+requires-python = ">=3.13"
 dynamic = ["version"]
 
 # https://pypi.org/classifiers/
