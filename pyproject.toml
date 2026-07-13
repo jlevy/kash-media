@@ -41,7 +41,10 @@ classifiers = [
 
 dependencies = [
     # Main kash and kash kits:
-    "kash-docs[full]==0.1.20",
+    # Plain kash-docs (no [full]): media tools never used the PDF/browser features,
+    # so this drops docling/torch/playwright from the media install entirely. Add
+    # kash-docs[pdf] or [browser] explicitly if that ever changes.
+    "kash-docs==0.2.0",
     "sidematter-format>=0.1.0",
     # Utilities:
     "typing-extensions>=4.11.1",
@@ -84,13 +87,16 @@ required-version = ">=0.9"
 # the Makefile repeat it via UV_EXCLUDE_NEWER so copied commands retain the policy.
 # See: https://github.com/jlevy/supply-chain-hardening
 exclude-newer = "14 days"
-# TEMPORARY: override the openai pins/caps of kash-shell 0.3.37 (==1.99.9, via
-# kash-docs) and marker-pdf (<2.0.0) so this repo's lock can use litellm >=1.84.0,
-# which carries all known litellm CVE fixes and requires openai 2.x. Safe because
-# marker's openai-backed LLM mode is never enabled in this stack. Drop once the
-# kash-shell/kash-docs releases carry new pins and marker lifts its openai<2 cap.
-override-dependencies = ["openai>=2.20.0"]
-constraint-dependencies = ["litellm>=1.84.0"]
+# Per-package exceptions to the cool-off (remove each at the next routine upgrade
+# once it ages past the global window):
+# - kash-docs 0.2.0: first-party release published today from jlevy/kash-docs CI
+#   (trusted publishing), pinned exactly above. Carries kash-shell 0.4.1 with the
+#   litellm >=1.84 security floor, so no resolver overrides are needed anymore.
+# - kash-shell 0.4.1: pinned exactly by kash-docs 0.2.0; same first-party release
+#   train as above.
+# - pillow 12.3.0 (2026-07-01): security-fix release (PYSEC-2026-2254/2256/2257).
+exclude-newer-package = { kash-docs = "2026-07-15T00:00:00Z", kash-shell = "2026-07-15T00:00:00Z", pillow = "2026-07-02T00:00:00Z" }
+constraint-dependencies = ["pillow>=12.3.0"]
 
 [tool.uv.sources]
 # For bleeding edge:
