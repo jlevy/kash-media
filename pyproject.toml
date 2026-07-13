@@ -41,15 +41,15 @@ classifiers = [
 dependencies = [
     # Main kash and kash kits:
     "kash-docs[full]==0.1.20",
-    "sidematter-format>=0.0.3",
+    "sidematter-format>=0.1.0",
     # Utilities:
     "typing-extensions>=4.11.1",
     # Content tools:
-    "flowmark>=0.4.5",
-    "chopdiff>=0.2.1",
+    "flowmark>=0.7.2",
+    "chopdiff>=0.3.1",
     # "simplemma>=1.1.2",
     # For downloading media:
-    "yt-dlp>=2025.3.27",
+    "yt-dlp>=2026.6.9",
     "curl-cffi>=0.7.4",
     # For screen capture and image processing:
     "opencv-python>=4.11.0.86",
@@ -61,15 +61,29 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.5",
-    "pytest-sugar>=1.0.0",
-    "ruff>=0.11.0",
-    "codespell>=2.4.1",
+    "pytest>=9.1.0",
+    "pytest-sugar>=1.1.1",
+    "ruff>=0.15.20",
+    "codespell>=2.4.2",
     "rich>=14.0.0",
-    "basedpyright==1.29.5",  # TODO: Upgrade when Cursor supports it.
+    "basedpyright>=1.39.9",
     "funlog>=0.2.0",
-    "clideps>=0.1.1",
+    "clideps>=0.1.8",
 ]
+
+[tool.uv]
+# Supply-chain cool-off: never resolve releases newer than this date, so freshly
+# published (possibly compromised) versions get time to be vetted or yanked.
+# Bump this date (~2 weeks back from today) whenever upgrading dependencies.
+# See: https://github.com/jlevy/supply-chain-hardening
+exclude-newer = "2026-06-29T00:00:00Z"
+# TEMPORARY: override the openai pins/caps of kash-shell 0.3.37 (==1.99.9, via
+# kash-docs) and marker-pdf (<2.0.0) so this repo's lock can use litellm >=1.84.0,
+# which carries all known litellm CVE fixes and requires openai 2.x. Safe because
+# marker's openai-backed LLM mode is never enabled in this stack. Drop once the
+# kash-shell/kash-docs releases carry new pins and marker lifts its openai<2 cap.
+override-dependencies = ["openai>=2.20.0"]
+constraint-dependencies = ["litellm>=1.84.0"]
 
 [tool.uv.sources]
 # For bleeding edge:
