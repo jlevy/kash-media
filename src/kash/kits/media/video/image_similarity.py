@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import cv2
 from numpy.typing import NDArray
@@ -20,10 +20,11 @@ def frames_are_similar(frame1: NDArray[Any], frame2: NDArray[Any], threshold: fl
 
     # The structural_similarity function returns different values depending on 'full' parameter
     # When full=True, it returns (score, diff_image)
-    result = structural_similarity(gray1, gray2, full=True)
-    score = result[0]  # Get just the score
+    # skimage's stubs return an undiscriminated union for full/gradient variants;
+    # with full=True this is always (score, diff).
+    score, _diff = cast("tuple[float, Any]", structural_similarity(gray1, gray2, full=True))
 
-    return score > threshold
+    return float(score) > threshold
 
 
 def filter_similar_frames(frame_paths: list[Path], threshold: float = 0.95) -> list[int]:

@@ -8,6 +8,7 @@ import yt_dlp
 from clideps.pkgs.pkg_check import pkg_check
 from clideps.pkgs.pkg_types import Platform
 from frontmatter_format import to_yaml_string
+from yt_dlp.utils import download_range_func
 
 from kash.config.logger import get_logger
 from kash.utils.common.url import Url
@@ -27,7 +28,8 @@ def parse_date(upload_date: str | date) -> date:
 
 
 def ydl_extract_info(url: Url) -> dict[str, Any]:
-    ydl_opts = {
+    # yt-dlp's params TypedDict is private and our option keys are dynamic, so type as Any.
+    ydl_opts: Any = {
         "extract_flat": "in_playlist",  # Extract metadata only, without downloading.
         "quiet": True,
         "dump_single_json": True,
@@ -41,7 +43,7 @@ def ydl_extract_info(url: Url) -> dict[str, Any]:
         if not isinstance(result, dict):
             raise ApiResultError(f"Unexpected result from yt_dlp: {result}")
 
-        return result
+        return dict(result)
 
 
 def ydl_download_media(
@@ -63,7 +65,7 @@ def ydl_download_media(
         media_types = [MediaType.audio, MediaType.video]
 
     temp_dir = target_dir or tempfile.mkdtemp()
-    ydl_opts: dict[str, Any]
+    ydl_opts: Any
     if MediaType.video in media_types:
         ydl_opts = {
             # Try for best video+audio, fall back to best available.
@@ -101,8 +103,11 @@ def ydl_download_media(
     # Add time slicing support if slice is provided
     if slice:
         # Tell yt-dlp the exact seconds we want
-        ydl_opts["download_ranges"] = yt_dlp.download_range_func(
-            None, [(slice.start_time, slice.end_time)]
+        # Empty chapters == None at runtime; float seconds work despite the int-typed
+        # stub, and truncating to int would lose sub-second precision.
+        ydl_opts["download_ranges"] = download_range_func(
+            [],
+            [(slice.start_time, slice.end_time)],  # pyright: ignore[reportArgumentType]
         )
         ydl_opts["force_keyframes_at_cuts"] = True
 

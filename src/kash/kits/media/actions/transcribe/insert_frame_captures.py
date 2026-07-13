@@ -125,7 +125,7 @@ def insert_frame_captures(item: Item, threshold: float = SIM_THRESHOLD) -> Item:
         new_offset = extractor.offsets[insert_index]
         frame_path = rel_frame_paths[i]
         insertions.append(
-            (
+            Insertion(
                 new_offset,
                 md_para(
                     html_img(

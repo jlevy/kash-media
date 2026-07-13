@@ -30,6 +30,7 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Typing :: Typed",
     # Include this to avoid accidentally publishing to PyPI:
     # "Private :: Do Not Upload",
@@ -41,15 +42,15 @@ classifiers = [
 dependencies = [
     # Main kash and kash kits:
     "kash-docs[full]==0.1.20",
-    "sidematter-format>=0.0.3",
+    "sidematter-format>=0.1.0",
     # Utilities:
     "typing-extensions>=4.11.1",
     # Content tools:
-    "flowmark>=0.4.5",
-    "chopdiff>=0.2.1",
+    "flowmark>=0.7.2",
+    "chopdiff>=0.3.1",
     # "simplemma>=1.1.2",
     # For downloading media:
-    "yt-dlp>=2025.3.27",
+    "yt-dlp>=2026.6.9",
     "curl-cffi>=0.7.4",
     # For screen capture and image processing:
     "opencv-python>=4.11.0.86",
@@ -60,16 +61,36 @@ dependencies = [
 # ---- Dev dependencies ----
 
 [dependency-groups]
-dev = [
-    "pytest>=8.3.5",
-    "pytest-sugar>=1.0.0",
-    "ruff>=0.11.0",
-    "codespell>=2.4.1",
-    "rich>=14.0.0",
-    "basedpyright==1.29.5",  # TODO: Upgrade when Cursor supports it.
-    "funlog>=0.2.0",
-    "clideps>=0.1.1",
+build = [
+    "hatchling==1.30.1",
+    "uv-dynamic-versioning==0.14.0",
 ]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-sugar>=1.1.1",
+    "ruff>=0.15.20",
+    "codespell>=2.4.2",
+    "rich>=15.0.0",
+    "basedpyright>=1.39.9",
+    "funlog>=0.2.1",
+    "clideps>=0.1.8",
+]
+
+[tool.uv]
+# Fail fast on old uv versions rather than misbehave. 0.9 is the floor where
+# exclude-newer accepts a relative duration like "14 days".
+required-version = ">=0.9"
+# Rolling supply-chain cool-off: never resolve releases younger than this. CI and
+# the Makefile repeat it via UV_EXCLUDE_NEWER so copied commands retain the policy.
+# See: https://github.com/jlevy/supply-chain-hardening
+exclude-newer = "14 days"
+# TEMPORARY: override the openai pins/caps of kash-shell 0.3.37 (==1.99.9, via
+# kash-docs) and marker-pdf (<2.0.0) so this repo's lock can use litellm >=1.84.0,
+# which carries all known litellm CVE fixes and requires openai 2.x. Safe because
+# marker's openai-backed LLM mode is never enabled in this stack. Drop once the
+# kash-shell/kash-docs releases carry new pins and marker lifts its openai<2 cap.
+override-dependencies = ["openai>=2.20.0"]
+constraint-dependencies = ["litellm>=1.84.0"]
 
 [tool.uv.sources]
 # For bleeding edge:
@@ -99,7 +120,7 @@ kash-mcp = "kash.mcp.mcp_cli:main"
 # https://github.com/ninoseki/uv-dynamic-versioning/
 
 [build-system]
-requires = ["hatchling", "uv-dynamic-versioning"]
+requires = ["hatchling==1.30.1", "uv-dynamic-versioning==0.14.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]
@@ -141,9 +162,9 @@ select = [
     "B", # https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
     "I", # https://docs.astral.sh/ruff/rules/#isort-i
     # Other possibilities:
-    # "D" # https://docs.astral.sh/ruff/rules/#pydocstyle-d
-    # "Q" # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
-    # "COM" # https://docs.astral.sh/ruff/rules/#flake8-commas-com
+    # "D", # https://docs.astral.sh/ruff/rules/#pydocstyle-d
+    # "Q", # https://docs.astral.sh/ruff/rules/#flake8-quotes-q
+    # "COM", # https://docs.astral.sh/ruff/rules/#flake8-commas-com
     # "SIM", # https://docs.astral.sh/ruff/rules/#flake8-simplify-sim
 
 ]
