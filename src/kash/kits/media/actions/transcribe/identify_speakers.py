@@ -41,11 +41,12 @@ def identify_speakers(item: Item, model: LLMName = LLM.default_fast) -> Item:
         """
         The transcript below includes speakers identified by IDs like 'SPEAKER 0' or 'SPEAKER 1'.
         Based on the info below and the transcript, provide a mapping from speaker IDs to
-        actual speaker names.
+        speaker labels. Use an actual name when it is known. Otherwise, use a concise,
+        descriptive role such as "Interviewer" or "Hotel Receptionist" when the role is
+        clear from the context.
 
         The mapping should be in JSON format.
-        If you are not sure from the content, leave the names as is and only fill in the
-        known names. Examples:
+        If neither a name nor a role is clear, leave the label as is. Examples:
         {json_examples}
 
         First, here is the available info on the original recording or video:
@@ -63,9 +64,11 @@ def identify_speakers(item: Item, model: LLMName = LLM.default_fast) -> Item:
         """
         Example 1: {{"0": "Alice", "1": "Bob"}}
 
-        Example 2: {{"0": "Alice", "1": "SPEAKER 1"}}
+        Example 2: {{"0": "Interviewer", "1": "Bob"}}
 
-        Example 3: {{"0": "SPEAKER 0", "1": "SPEAKER 1"}}
+        Example 3: {{"0": "Alice", "1": "SPEAKER 1"}}
+
+        Example 4: {{"0": "SPEAKER 0", "1": "SPEAKER 1"}}
         """
     )
 
