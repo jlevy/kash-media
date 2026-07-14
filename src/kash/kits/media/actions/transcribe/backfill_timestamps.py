@@ -11,7 +11,12 @@ from chopdiff.docs import (
     TokenMapping,
     search_tokens,
 )
-from chopdiff.html import ContentNotFound, TimestampExtractor
+from chopdiff.html import (
+    ContentNotFound,
+    TimestampExtractor,
+    extract_timestamp,
+    has_timestamp,
+)
 
 from kash.config.logger import get_logger
 from kash.exec import kash_action
@@ -24,6 +29,29 @@ from kash.utils.errors import InvalidInput, UnexpectedError
 from kash.workspaces.source_items import find_upstream_item, find_upstream_resource
 
 log = get_logger(__name__)
+
+
+def _extract_following_timestamp(extractor: TimestampExtractor, wordtok_offset: int) -> float:
+    """Find the first timestamp at or after the mapped start of a text unit."""
+    try:
+        wordtok = extractor.wordtoks[wordtok_offset]
+        if not has_timestamp(wordtok):
+            _index, wordtok = (
+                search_tokens(extractor.wordtoks)
+                .at(wordtok_offset)
+                .seek_forward(has_timestamp)
+                .get_token()
+            )
+        timestamp = extract_timestamp(wordtok)
+        if timestamp is not None:
+            return timestamp
+    except (IndexError, KeyError) as e:
+        raise ContentNotFound(
+            f"No timestamp found searching forward from token {wordtok_offset}"
+        ) from e
+    raise ContentNotFound(
+        f"No timestamp found searching forward from token {wordtok_offset}: {wordtok!r}"
+    )
 
 
 @kash_action(
@@ -131,7 +159,12 @@ def backfill_timestamps(item: Item, chunk_unit: TextUnit = TextUnit.paragraphs) 
             )
 
             try:
-                timestamp, _index, _offset = extractor.extract_preceding(source_wordtok_offset)
+                if chunk_unit == TextUnit.paragraphs:
+                    # The mapped paragraph start commonly lands on a speaker label. Seeking
+                    # backward there selects the previous speaker turn's timestamp.
+                    timestamp = _extract_following_timestamp(extractor, source_wordtok_offset)
+                else:
+                    timestamp, _index, _offset = extractor.extract_preceding(source_wordtok_offset)
 
                 timestamp_list.append(timestamp)
                 sent_index_list.append(sent_index)
@@ -165,3 +198,17 @@ def backfill_timestamps(item: Item, chunk_unit: TextUnit = TextUnit.paragraphs) 
     output_item.body = item_doc.reassemble()
 
     return output_item
+
+
+## Tests
+
+
+def test_extract_following_timestamp_skips_previous_speaker_turn():
+    extractor = TimestampExtractor(
+        '<span data-timestamp="1.0">First turn.</span> '
+        '<span data-speaker-id="1">SPEAKER 1:</span> '
+        '<span data-timestamp="5.0">Second turn.</span>'
+    )
+    speaker_offset = extractor.wordtoks.index("SPEAKER")
+
+    assert _extract_following_timestamp(extractor, speaker_offset) == 5.0

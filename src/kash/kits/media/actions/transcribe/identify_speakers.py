@@ -7,11 +7,12 @@ from kash.config.logger import get_logger
 from kash.exec import kash_action
 from kash.exec.preconditions import has_html_body, has_simple_text_body
 from kash.kits.media.video.speaker_labels import find_speaker_labels
-from kash.llm_utils import LLM, Message, MessageTemplate
+from kash.llm_utils import LLM, LLMName, Message, MessageTemplate
 from kash.llm_utils.fuzzy_parsing import fuzzy_parse_json
 from kash.llm_utils.llm_completion import llm_template_completion
 from kash.media_base.timestamp_citations import html_speaker_id_span
 from kash.model import Item, ItemType
+from kash.model.params_model import common_params
 from kash.utils.errors import ApiResultError, InvalidInput
 
 log = get_logger(__name__)
@@ -19,8 +20,9 @@ log = get_logger(__name__)
 
 @kash_action(
     precondition=has_simple_text_body | has_html_body,
+    params=common_params("model"),
 )
-def identify_speakers(item: Item) -> Item:
+def identify_speakers(item: Item, model: LLMName = LLM.default_fast) -> Item:
     """
     Identify speakers in a transcript and replace placeholders with their names.
     """
@@ -73,7 +75,7 @@ def identify_speakers(item: Item) -> Item:
 
     # Perform LLM completion to get the speaker mapping.
     mapping_str = llm_template_completion(
-        model=LLM.gpt_4o_mini,
+        model=model,
         system_message=system_message,
         input=item.body,
         body_template=MessageTemplate(message + "\n\n" + "{body}"),
@@ -105,3 +107,33 @@ def identify_speakers(item: Item) -> Item:
 
     result_item = item.derived_copy(type=ItemType.doc, body=updated_body)
     return result_item
+
+
+## Tests
+
+
+def test_identify_speakers_forwards_selected_model():
+    from inspect import unwrap
+    from types import SimpleNamespace
+    from unittest.mock import patch
+
+    model = LLMName("gpt-5.6-luna")
+    item = Item(
+        type=ItemType.doc,
+        title="Alice interviews Bob",
+        body=(
+            '<span class="speaker-label" data-speaker-id="0">SPEAKER 0:</span> Hello. '
+            '<span class="speaker-label" data-speaker-id="1">SPEAKER 1:</span> Hi.'
+        ),
+    )
+
+    with patch(
+        "kash.kits.media.actions.transcribe.identify_speakers.llm_template_completion",
+        return_value=SimpleNamespace(content='{"0": "Alice", "1": "Bob"}'),
+    ) as completion:
+        result = unwrap(identify_speakers)(item, model=model)
+
+    assert result.body
+    assert "Alice" in result.body
+    assert "Bob" in result.body
+    assert completion.call_args.kwargs["model"] == model
