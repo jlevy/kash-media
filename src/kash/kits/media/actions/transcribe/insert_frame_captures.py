@@ -34,6 +34,12 @@ def has_frame_captures(item: Item) -> bool:
 SIM_THRESHOLD = 0.5
 
 
+def _prune_filtered_frames(abs_frame_paths: list[Path], kept_indices: set[int]) -> None:
+    for index, frame_path in enumerate(abs_frame_paths):
+        if index not in kept_indices:
+            frame_path.unlink()
+
+
 @kash_action(
     precondition=has_simple_text_body & has_timestamps & ~has_frame_captures,
     params=(
@@ -96,6 +102,7 @@ def insert_frame_captures(item: Item, threshold: float = SIM_THRESHOLD) -> Item:
 
     # Create a set of indices that were kept.
     kept_indices = set(unique_indices)
+    _prune_filtered_frames(abs_frame_paths, kept_indices)
 
     # Prepare insertions.
     log.message(
@@ -144,3 +151,19 @@ def insert_frame_captures(item: Item, threshold: float = SIM_THRESHOLD) -> Item:
     output_item.body = output_text
 
     return output_item
+
+
+## Tests
+
+
+def test_prune_filtered_frames_removes_only_rejected_candidates() -> None:
+    from tempfile import TemporaryDirectory
+
+    with TemporaryDirectory() as temp_dir:
+        frame_paths = [Path(temp_dir) / f"frame_{index}.jpg" for index in range(4)]
+        for frame_path in frame_paths:
+            frame_path.write_bytes(b"frame")
+
+        _prune_filtered_frames(frame_paths, {0, 2})
+
+        assert [frame_path.exists() for frame_path in frame_paths] == [True, False, True, False]
