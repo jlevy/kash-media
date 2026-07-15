@@ -18,6 +18,15 @@ make
 uv run kash
 ```
 
+## Model Configuration
+
+This kit inherits the current model profiles from kash-shell. Speaker identification
+uses the configurable `fast_llm` workspace parameter instead of requiring a specific
+provider. Media transcription uses Deepgram `nova-3` with the newest generally
+available batch diarizer. See the main
+[model configuration documentation](https://github.com/jlevy/kash#model-configuration)
+for the current Anthropic defaults and equivalent OpenAI settings.
+
 For how to install uv and Python, see [installation.md](docs/installation.md).
 
 For development workflows, see [development.md](docs/development.md).
