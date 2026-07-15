@@ -1,4 +1,4 @@
-from chopdiff.html import html_find_tag
+from flexdoc.html import html_find_tag
 from strif import replace_multiple
 
 from kash.config.logger import get_logger

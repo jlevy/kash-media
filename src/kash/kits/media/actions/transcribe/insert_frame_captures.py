@@ -1,8 +1,8 @@
 from pathlib import Path
 
 from chopdiff.divs import parse_divs
-from chopdiff.docs import search_tokens
-from chopdiff.html import TimestampExtractor, html_img, md_para
+from flexdoc.docs.search_tokens import search_tokens
+from flexdoc.html import TimestampExtractor, html_img, md_para
 from sidematter_format import Sidematter
 from strif import Insertion, insert_multiple
 

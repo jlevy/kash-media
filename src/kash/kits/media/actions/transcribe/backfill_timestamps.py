@@ -1,17 +1,17 @@
 from textwrap import indent
 
-from chopdiff.docs import (
+from flexdoc import FlexDoc as TextDoc
+from flexdoc import TextUnit
+from flexdoc.docs import SentIndex
+from flexdoc.docs.search_tokens import search_tokens
+from flexdoc.docs.token_mapping import TokenMapping
+from flexdoc.docs.wordtoks import (
     BOF_TOK,
     EOF_TOK,
     PARA_BR_TOK,
     SENT_BR_TOK,
-    SentIndex,
-    TextDoc,
-    TextUnit,
-    TokenMapping,
-    search_tokens,
 )
-from chopdiff.html import (
+from flexdoc.html import (
     ContentNotFound,
     TimestampExtractor,
     extract_timestamp,
