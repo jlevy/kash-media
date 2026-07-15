@@ -181,13 +181,13 @@ template).
 
 1. **Release order**: kash-media releases last in the chain
    (kash → kash-docs → kash-media → apps like deep-transcribe); bump the
-   `kash-docs[full]==` pin here first, then release.
+   plain `kash-docs==` pin here first, then release. Media intentionally omits
+   PDF/DOCX, AWS, and browser extras.
 
-2. **Release notes MUST state the dependency reality**: this repo inherits the
-   lock-only `tool.uv` override of marker-pdf's `openai<2` cap via kash-docs[full].
-   Until marker lifts that cap, plain-pip installs of the [full] chain cannot
-   resolve litellm >=1.84 + openai 2.x. Load
-   `tbd guidelines release-notes-guidelines` for the notes themselves.
+2. **Release notes MUST state the dependency reality**: plain kash-media installs use
+   the lean kash-docs base and do not include document conversion, AWS, browser, or
+   layout-aware PDF runtimes. Load `tbd guidelines release-notes-guidelines` for the
+   notes themselves.
 
 3. **Same-day first-party pins** (a kash-docs released today is inside the 14-day
    cool-off): allow it surgically and remove at the next routine upgrade:
