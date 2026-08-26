@@ -5,6 +5,9 @@ from kash.exec.preconditions import is_audio_resource, is_url_resource, is_video
 from kash.kits.docs.actions.text.break_into_paragraphs import break_into_paragraphs
 from kash.kits.media.actions.transcribe.backfill_timestamps import backfill_timestamps
 from kash.kits.media.actions.transcribe.identify_speakers import identify_speakers
+from kash.kits.media.actions.transcribe.normalize_transcript_spacing import (
+    normalize_transcript_spacing,
+)
 from kash.kits.media.actions.transcribe.transcribe import transcribe
 from kash.model import Item
 from kash.model.params_model import common_params
@@ -26,8 +29,9 @@ def transcribe_format(item: Item, language: str = "en") -> Item:
     transcribed_item = transcribe(item, language=language)
 
     with_speakers = identify_speakers(transcribed_item)
+    normalized = normalize_transcript_spacing(with_speakers)
 
-    stripped = strip_html(with_speakers)
+    stripped = strip_html(normalized)
 
     paragraphs = break_into_paragraphs(stripped)
 

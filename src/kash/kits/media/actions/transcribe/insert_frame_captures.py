@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from chopdiff.divs import parse_divs
-from flexdoc.docs.search_tokens import search_tokens
 from flexdoc.html import TimestampExtractor, html_img, md_para
 from sidematter_format import Sidematter
 from strif import Insertion, insert_multiple
@@ -32,6 +31,20 @@ def has_frame_captures(item: Item) -> bool:
 
 
 SIM_THRESHOLD = 0.5
+
+
+def _offset_after_timestamp_span(extractor: TimestampExtractor, start_index: int) -> int:
+    depth = 0
+    for token_index in range(start_index, len(extractor.wordtoks)):
+        token = extractor.wordtoks[token_index]
+        if token.startswith("<span"):
+            depth += 1
+        elif token == "</span>":
+            depth -= 1
+            if depth == 0:
+                return extractor.offsets[token_index + 1]
+
+    raise KeyError("No matching timestamp span close")
 
 
 def _prune_filtered_frames(abs_frame_paths: list[Path], kept_indices: set[int]) -> None:
@@ -117,19 +130,12 @@ def insert_frame_captures(item: Item, threshold: float = SIM_THRESHOLD) -> Item:
             continue
 
         try:
-            insert_index = (
-                search_tokens(extractor.wordtoks)
-                .at(index)
-                .seek_forward(["</span>"])
-                .next()
-                .get_index()
-            )
+            new_offset = _offset_after_timestamp_span(extractor, index)
         except KeyError:
             raise ContentError(
                 f"No matching tag close starting at {offset}: {extractor.wordtoks[offset:]}"
             )
 
-        new_offset = extractor.offsets[insert_index]
         frame_path = rel_frame_paths[i]
         insertions.append(
             Insertion(
@@ -154,6 +160,21 @@ def insert_frame_captures(item: Item, threshold: float = SIM_THRESHOLD) -> Item:
 
 
 ## Tests
+
+
+def test_offset_after_timestamp_span_skips_nested_spans() -> None:
+    body = (
+        'Before <span class="citation timestamp-link" data-timestamp="12.3">'
+        '<span class="timestamp-icon">clock</span>'
+        '<a href="file:///video.mp4">00:12</a>&nbsp;</span> after.'
+    )
+    extractor = TimestampExtractor(body)
+    _timestamp, start_index, _offset = next(iter(extractor.extract_all()))
+
+    insert_offset = _offset_after_timestamp_span(extractor, start_index)
+
+    assert body[:insert_offset].endswith("</span>")
+    assert body[insert_offset:] == " after."
 
 
 def test_prune_filtered_frames_removes_only_rejected_candidates() -> None:
