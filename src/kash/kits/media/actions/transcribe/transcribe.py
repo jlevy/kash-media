@@ -17,6 +17,8 @@ log = get_logger(__name__)
 
 @kash_action(
     precondition=is_url_resource | is_audio_resource | is_video_resource,
+    output_type=ItemType.doc,
+    output_format=Format.html,
     params=common_params("language")
     + (
         Param(
@@ -85,6 +87,14 @@ def transcribe(
 
 
 ## Tests
+
+
+def test_transcribe_declares_cacheable_output_contract() -> None:
+    action_class = getattr(transcribe, "__action_class__")  # noqa: B009
+    action = action_class.create(None)
+
+    assert action.output_type is ItemType.doc
+    assert action.output_format is Format.html
 
 
 def test_transcribe_forwards_item_key_terms() -> None:

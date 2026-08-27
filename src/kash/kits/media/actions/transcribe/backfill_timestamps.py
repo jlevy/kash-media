@@ -56,6 +56,8 @@ def _extract_following_timestamp(extractor: TimestampExtractor, wordtok_offset: 
 
 @kash_action(
     precondition=has_simple_text_body & ~has_timestamps,
+    output_type=ItemType.doc,
+    output_format=Format.md_html,
     params=common_params("chunk_unit"),
 )
 def backfill_timestamps(item: Item, chunk_unit: TextUnit = TextUnit.paragraphs) -> Item:
@@ -201,6 +203,14 @@ def backfill_timestamps(item: Item, chunk_unit: TextUnit = TextUnit.paragraphs) 
 
 
 ## Tests
+
+
+def test_backfill_timestamps_declares_markdown_html_output() -> None:
+    action_class = getattr(backfill_timestamps, "__action_class__")  # noqa: B009
+    action = action_class.create(None)
+
+    assert action.output_type is ItemType.doc
+    assert action.output_format is Format.md_html
 
 
 def test_extract_following_timestamp_skips_previous_speaker_turn():
