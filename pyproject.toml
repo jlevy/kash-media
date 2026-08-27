@@ -44,7 +44,7 @@ dependencies = [
     # Plain kash-docs (no [full]): media tools never used the PDF/browser features,
     # so this drops docling/torch/playwright from the media install entirely. Add
     # kash-docs[pdf] or [browser] explicitly if that ever changes.
-    "kash-docs>=0.2.4,<0.3",
+    "kash-docs>=0.2.6,<0.3",
     "sidematter-format>=0.1.0",
     # Utilities:
     "typing-extensions>=4.11.1",
@@ -90,7 +90,7 @@ required-version = ">=0.9"
 exclude-newer = "14 days"
 # Per-package exceptions to the cool-off (remove each at the next routine upgrade
 # once it ages past the global window):
-# - kash-docs 0.2.4 and kash-shell 0.4.7: first-party releases published in this
+# - kash-docs 0.2.6 and kash-shell 0.4.8: first-party releases published in this
 #   release train from jlevy CI (trusted publishing, watched end to end).
 # - pillow 12.3.0 (2026-07-01): security-fix release (PYSEC-2026-2254/2256/2257).
 constraint-dependencies = ["pillow>=12.3.0"]
@@ -159,7 +159,10 @@ allow-direct-references = true
 
 # Explicitly configure top-level namespace for hatch.
 [tool.hatch.build.targets.wheel]
+# kash-shell exclusively owns kash/__init__.py. This extension uses its package root
+# only as a namespace for kash.kits.media so wheel install order cannot replace Kash's API.
 packages = ["src/kash"]
+exclude = ["src/kash/__init__.py"]
 
 [tool.hatch.build.targets.wheel.sources]
 "src/kash" = "kash"
