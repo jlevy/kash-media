@@ -249,7 +249,7 @@ def best_thumbnail(data: dict[str, Any]) -> Url | None:
 
 
 def test_parse_metadata_preserves_discovery_context() -> None:
-    metadata = YouTube()._parse_metadata(
+    metadata = YouTube()._parse_metadata(  # pyright: ignore[reportPrivateUsage]
         {
             "id": "abcdefghijk",
             "webpage_url": "https://www.youtube.com/watch?v=abcdefghijk",
