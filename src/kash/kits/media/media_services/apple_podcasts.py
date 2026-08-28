@@ -125,7 +125,7 @@ class ApplePodcasts(MediaService):
         self,
         yt_result: dict[str, Any],
         full: bool = False,
-        **overrides: dict[str, Any],
+        **overrides: Any,
     ) -> MediaMetadata:
         try:
             media_id = yt_result["id"]

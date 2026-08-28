@@ -41,6 +41,11 @@ classifiers = [
 
 dependencies = [
     # Main kash and kash kits:
+    # kash-shell is imported directly throughout this kit (kash.model, kash.exec,
+    # kash.config), so declare it rather than leaning on kash-docs to supply it.
+    # 0.4.10 is the first release whose MediaMetadata accepts the discovery fields the
+    # YouTube extractor passes below; on 0.4.9 every metadata fetch raises TypeError.
+    "kash-shell>=0.4.10,<0.5",
     # Plain kash-docs (no [full]): media tools never used the PDF/browser features,
     # so this drops docling/torch/playwright from the media install entirely. Add
     # kash-docs[pdf] or [browser] explicitly if that ever changes.

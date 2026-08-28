@@ -164,7 +164,7 @@ class YouTube(MediaService):
         return video_meta_list
 
     def _parse_metadata(
-        self, yt_result: dict[str, Any], full: bool = False, **overrides: dict[str, Any]
+        self, yt_result: dict[str, Any], full: bool = False, **overrides: Any
     ) -> MediaMetadata:
         try:
             media_id = yt_result["id"]  # Renamed for clarity.
@@ -196,7 +196,11 @@ class YouTube(MediaService):
                 title=yt_result["title"],
                 description=yt_result["description"],
                 upload_date=upload_date,
+                channel=yt_result.get("channel"),
+                uploader=yt_result.get("uploader"),
                 channel_url=Url(yt_result["channel_url"]),
+                categories=yt_result.get("categories"),
+                tags=yt_result.get("tags"),
                 view_count=yt_result.get("view_count"),
                 duration=yt_result.get("duration"),
                 heatmap=heatmap,
@@ -242,6 +246,28 @@ def best_thumbnail(data: dict[str, Any]) -> Url | None:
 
 
 ## Tests
+
+
+def test_parse_metadata_preserves_discovery_context() -> None:
+    metadata = YouTube()._parse_metadata(  # pyright: ignore[reportPrivateUsage]
+        {
+            "id": "abcdefghijk",
+            "webpage_url": "https://www.youtube.com/watch?v=abcdefghijk",
+            "title": "Hotel Check In - SNL",
+            "description": "An SNL hotel sketch.",
+            "upload_date": "20171015",
+            "channel": "Saturday Night Live",
+            "uploader": "Saturday Night Live",
+            "channel_url": "https://www.youtube.com/channel/example",
+            "categories": ["Entertainment"],
+            "tags": ["SNL", "comedy", "hotel"],
+        }
+    )
+
+    assert metadata.channel == "Saturday Night Live"
+    assert metadata.uploader == "Saturday Night Live"
+    assert metadata.categories == ["Entertainment"]
+    assert metadata.tags == ["SNL", "comedy", "hotel"]
 
 
 def test_canonicalize_youtube():
