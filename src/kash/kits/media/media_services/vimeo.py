@@ -89,7 +89,7 @@ class Vimeo(MediaService):
         return ydl_extract_info(url)
 
     def _parse_metadata(
-        self, vimeo_result: dict[str, Any], full: bool = False, **overrides: dict[str, Any]
+        self, vimeo_result: dict[str, Any], full: bool = False, **overrides: Any
     ) -> MediaMetadata:
         try:
             media_id = vimeo_result["id"]

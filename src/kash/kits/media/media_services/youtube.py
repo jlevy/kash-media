@@ -164,7 +164,7 @@ class YouTube(MediaService):
         return video_meta_list
 
     def _parse_metadata(
-        self, yt_result: dict[str, Any], full: bool = False, **overrides: dict[str, Any]
+        self, yt_result: dict[str, Any], full: bool = False, **overrides: Any
     ) -> MediaMetadata:
         try:
             media_id = yt_result["id"]  # Renamed for clarity.
