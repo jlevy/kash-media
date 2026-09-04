@@ -11,6 +11,10 @@ from frontmatter_format import to_yaml_string
 from yt_dlp.utils import download_range_func
 
 from kash.config.logger import get_logger
+from kash.kits.media.utils.video_download_options import (
+    DEFAULT_VIDEO_OPTIONS,
+    VideoDownloadOptions,
+)
 from kash.utils.common.url import Url
 from kash.utils.common.url_slice import Slice
 from kash.utils.errors import ApiResultError
@@ -51,10 +55,15 @@ def ydl_download_media(
     target_dir: Path | None = None,
     media_types: list[MediaType] | None = None,
     slice: Slice | None = None,
+    video_options: VideoDownloadOptions | None = None,
 ) -> dict[MediaType, Path]:
     """
     Download and convert to mp3 and mp4 using yt_dlp, which is generally the best
     library for this.
+
+    `video_options` controls how much video to fetch and how it is packaged; see
+    `VideoDownloadOptions`. The defaults favor a stream copy over a transcode, which
+    matters enormously on long sources.
     """
     # We need ffmpeg CLI. On Linux we also need libgl1 (has several names but clideps
     # knows about it).
@@ -63,19 +72,24 @@ def ydl_download_media(
 
     if not media_types:
         media_types = [MediaType.audio, MediaType.video]
+    video_options = video_options or DEFAULT_VIDEO_OPTIONS
 
     temp_dir = target_dir or tempfile.mkdtemp()
     ydl_opts: Any
     if MediaType.video in media_types:
         ydl_opts = {
-            # Try for best video+audio, fall back to best available.
-            # Might want to support smaller sizes tho.
-            # "format": "bestvideo[height<=720]+bestaudio/best",
-            "format": "bestvideo+bestaudio/best",
+            # Prefer streams that already fit an mp4 container, and cap the height, so
+            # the packaging step below can be a copy rather than a transcode.
+            "format": video_options.to_format_selector(),
             "outtmpl": os.path.join(temp_dir, "media.%(id)s.%(ext)s"),
             "postprocessors": [
                 {
-                    "key": "FFmpegVideoConvertor",
+                    # Remuxer, not FFmpegVideoConvertor: that postprocessor
+                    # re-encodes whenever the source is not already mp4, which on a
+                    # multi-hour video costs hours of CPU for no benefit. The remuxer
+                    # copies the streams and only falls back to encoding when it
+                    # truly must.
+                    "key": "FFmpegVideoRemuxer",
                     "preferedformat": "mp4",  # Yep, it's really spelled this way in yt_dlp.
                 },
                 {
