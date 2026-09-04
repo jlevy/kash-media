@@ -48,9 +48,13 @@ class VideoDownloadOptions:
         if not self.prefer_compatible:
             return f"bestvideo{height}+bestaudio/best{height}/best"
 
-        # Ordered by how little work each choice creates downstream: an mp4/m4a pair
-        # needs only a stream copy, anything else may need a transcode.
+        # Ordered by how little work and how few bytes each choice costs. H.264 with
+        # AAC remuxes without re-encoding and is the smallest sane option at a given
+        # resolution: asking only for "best mp4" selects the highest bitrate, which on
+        # YouTube is a Premium VP9 stream several times larger than ordinary H.264 at
+        # the same height, often with no size metadata to warn you.
         return (
+            f"bestvideo{height}[vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]/"
             f"bestvideo{height}[ext=mp4]+bestaudio[ext=m4a]/"
             f"bestvideo{height}+bestaudio/"
             f"best{height}/best"
@@ -68,8 +72,10 @@ def test_default_selector_prefers_compatible_and_caps_height() -> None:
     selector = VideoDownloadOptions().to_format_selector()
 
     assert selector.startswith(
-        f"bestvideo[height<={DEFAULT_MAX_HEIGHT}][ext=mp4]+bestaudio[ext=m4a]"
+        f"bestvideo[height<={DEFAULT_MAX_HEIGHT}][vcodec^=avc1][ext=mp4]+bestaudio[ext=m4a]"
     )
+    # Falls back to any mp4 pair before giving up on the container.
+    assert "[ext=mp4]+bestaudio[ext=m4a]/" in selector
     # Always keeps a fallback so an unusual source still downloads.
     assert selector.endswith("/best")
 
@@ -80,6 +86,8 @@ def test_callers_can_lift_the_cap_or_the_preference() -> None:
 
     raw = VideoDownloadOptions(prefer_compatible=False).to_format_selector()
     assert "ext=mp4" not in raw
+    assert "avc1" not in raw
+    assert "avc1" not in raw
 
     small = VideoDownloadOptions(max_height=480).to_format_selector()
     assert "[height<=480]" in small
