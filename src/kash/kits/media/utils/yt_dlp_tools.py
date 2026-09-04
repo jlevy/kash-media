@@ -84,10 +84,11 @@ def ydl_download_media(
             "outtmpl": os.path.join(temp_dir, "media.%(id)s.%(ext)s"),
             "postprocessors": [
                 {
-                    # Remuxer, not FFmpegVideoConvertor: the convertor re-encodes
-                    # whenever the source is not already mp4, which on a multi-hour
-                    # video costs hours of CPU for no benefit. The remuxer copies the
-                    # streams and only falls back to encoding when it truly must.
+                    # Remuxer, not FFmpegVideoConvertor: that postprocessor
+                    # re-encodes whenever the source is not already mp4, which on a
+                    # multi-hour video costs hours of CPU for no benefit. The remuxer
+                    # copies the streams and only falls back to encoding when it
+                    # truly must.
                     "key": "FFmpegVideoRemuxer",
                     "preferedformat": "mp4",  # Yep, it's really spelled this way in yt_dlp.
                 },
