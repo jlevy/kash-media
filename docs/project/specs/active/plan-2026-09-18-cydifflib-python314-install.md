@@ -3,15 +3,19 @@ title: "Plan Spec: Unblock kash installs blocked by cydifflib on Python 3.14"
 description: >-
   Coordinated flexdoc, chopdiff, kash-shell, kash-docs, and kash-media
   releases so uv tool install / uvx no longer fail building cydifflib on
-  Python 3.14.
+  GIL Python 3.14. Freethreaded 3.14t stays unsupported.
 ---
 # Feature: Unblock kash Installs Blocked by cydifflib on Python 3.14
 
 **Date:** 2026-09-18 (last updated 2026-09-18)
 
+**Spike (2026-09-18):** GIL CPython 3.14.6 installs and imports the full
+published kash-media graph, including frame capture (`cv2` + `skimage`).
+Freethreaded 3.14t does not. See Background.
+
 **Author:** Joshua Levy
 
-**Status:** Draft
+**Status:** Active (decisions locked 2026-09-18)
 
 ## Overview
 
@@ -34,35 +38,67 @@ Two releases make that fix selectable:
    validates 0.4.x (especially `TextUnit.words`), and publishes.
    kash-shell, kash-docs, and kash-media then lock both new lower bounds.
 
-jlevy first-party packages are exempt from the 14-day cool-off.
+jlevy first-party packages are exempt from the 14-day cool-off
+(`2099-12-31` per-package exemptions).
 Consumers may depend on a tag the same day it is on PyPI.
 chopdiff’s *dated* flexdoc exception (`2026-07-12`) is not that exemption and
 must be updated, or 0.4.1 will not resolve in that repo.
 
+PRs land first.
+Release tags wait for explicit user signoff.
+
+## Decisions
+
+Locked 2026-09-18:
+
+- **GIL Python 3.14 is allowed for kash-media.** The vision stack works
+  (opencv-python 5.0.0.93 `abi3`, scikit-image).
+  Use `requires-python = ">=3.13,<3.15"` and keep the 3.14 classifier.
+- **Python 3.14t (freethreaded) is unsupported.** Bare `uv tool install` /
+  `uvx` still pick the latest managed Python, which can be 3.14t.
+  Install docs must keep `--python 3.13` or `--python 3.14` (GIL).
+  Do not claim 3.14t.
+- **PRs now; tags only after user signoff.** Do not cut `v0.3.1`, `v0.4.1`,
+  or later consumer tags until the user says so.
+- **Lower-level libraries first.** File the flexdoc 0.3.1 and 0.4.1 PRs in
+  parallel.
+  Immediate unblock is flexdoc `v0.3.1` from tag `v0.3.0` (chopdiff 0.4.0
+  already allows `0.3.x`).
+- **Coordinated train:** flexdoc `v0.4.1` on `main` (same cydifflib drop);
+  then chopdiff `flexdoc>=0.4.1,<0.5` and cool-off `2099-12-31`.
+- **jlevy first-party repos have no cool-off restriction.** Use
+  `2099-12-31` exemptions.
+
+These close the earlier questions about whether 3.14 is a supported kash-media
+runtime, whether a bare unpinned `uv tool install` must succeed, and whether
+this pass should tag as well as open PRs.
+
 ## Goals
 
-- Make `uv tool install kash-media` and `uvx kash-shell@latest` succeed from a
-  directory with no `.python-version` pin (uv’s default latest Python, today
-  3.14 / 3.14t)
 - Ship flexdoc 0.3.1 so the *current* published graph (chopdiff 0.4.0 +
   kash-media 0.4.9) can drop cydifflib without waiting on chopdiff
+- Make `uv tool install --python 3.13 kash-media` and
+  `uv tool install --python 3.14 kash-media` succeed without building
+  cydifflib, and the same for `uvx --python 3.13|3.14 kash-shell@latest`
 - Move the first-party train onto flexdoc 0.4.1 by changing chopdiff, then
   relocking kash-shell, kash-docs, and kash-media
-- Record the uv interpreter-selection trap in kash-media install docs
-  (`--python 3.13` remains the safe pin while kash-media’s `requires-python`
-  is `<3.14`)
+- Allow GIL 3.14 on kash-media (`requires-python >=3.13,<3.15`)
+- Record the uv interpreter-selection trap in kash-media install docs:
+  `--python 3.13` or `--python 3.14` remains required because a bare
+  `uv tool install` / `uvx` can still select 3.14t
 
 ## Non-Goals
 
-- Adding Python 3.14 as a supported runtime for kash-media or kash-docs.
-  Both already declare `requires-python = "<3.14"`.
-  This plan unblocks *accidental* 3.14 resolution; it does not certify 3.14.
-- Changing uv itself.
+- Supporting freethreaded Python 3.14t, or claiming that a bare
+  `uv tool install` / `uvx` with no `--python` will succeed when uv picks
+  3.14t
+- Changing uv itself
 - Touching third-party flexdoc pins outside this train (ojoshe, practical-prose,
-  and similar).
-- Replacing cydifflib with another native accelerator.
+  and similar)
+- Replacing cydifflib with another native accelerator
 - Reworking chopdiff windowing or chunk APIs except as required to accept
-  flexdoc 0.4.x `TextUnit.words` semantics.
+  flexdoc 0.4.x `TextUnit.words` semantics
+- Cutting release tags in this pass
 
 ## Background
 
@@ -84,7 +120,44 @@ The sdist build fails with unknown `__pyx_vectorcallfunc` and a
 `--python 3.13` installs cleanly today (kash-media 0.4.9, kash-shell 0.4.11,
 flexdoc 0.3.0, cydifflib wheel).
 
-### Published dependency graph
+### Spike: GIL 3.14 vs Freethreaded 3.14t
+
+Tested 2026-09-18 on macOS arm64.
+
+**CPython 3.14.6 (GIL, uv-managed)** — works for kash-media as published.
+
+- `uv pip install kash-media` completed (cydifflib 1.2.0 built a
+  `_initialize.cpython-314-darwin.so`; opencv-python 5.0.0.93 used its
+  `cp37-abi3` wheel).
+- Frame path imported and ran a tiny SSIM: `cv2` 5.0.0, `skimage` 0.26.0,
+  `structural_similarity` self-score 1.0, `VideoCapture` constructs,
+  backends include `AVFOUNDATION` and `FFMPEG`.
+- Also imported `kash.kits.media.video.video_frames` and
+  `image_similarity`, plus `tokenizers`, `curl_cffi`, `yt_dlp`.
+- The pyproject comment that onnxruntime lacks 3.14 wheels is stale.
+  Neither onnxruntime nor torch is on the default media graph
+  (`kash-docs` without `[full]`). A probe install of current wheels
+  succeeded: onnxruntime 1.29.0, torch 2.14.0.
+
+**CPython 3.14.7+freethreaded** — not a supported install target.
+
+- This is what `uv python find` / `uv tool install` pick as “latest”
+  from a directory with no pin (tbd, `/tmp`, `$HOME`).
+- `cydifflib` sdist fails to compile (`__pyx_vectorcallfunc`,
+  `PyTuple_GetSlice`).
+- `opencv-python` 5.0.0.93 has no `cp314t` wheel; the `abi3` wheel is
+  not used. uv starts a full OpenCV source build (still compiling after
+  two minutes; not a viable `uv tool install` path).
+
+**Implication for `requires-python`:** kash-media can allow GIL 3.14
+(`>=3.13,<3.15` plus a 3.14 classifier) for project venvs and
+`--python 3.14`. That does not make bare `uv tool install kash-media`
+work, because uv still selects 3.14t. Dropping cydifflib is not enough
+for 3.14t either; opencv would then be the next source-build wall.
+Keep telling tool users `--python 3.13` or `--python 3.14` (not
+`3.14t`). Do not claim 3.14t support.
+
+### Published Dependency Graph
 
 ```
 cydifflib 1.2.0
@@ -113,7 +186,7 @@ kash-media 0.4.9
   kash-shell>=0.4.10,<0.5
   kash-docs>=0.2.7,<0.3
   requires-python >=3.13,<3.14
-  classifier incorrectly lists 3.14
+  classifier already lists 3.14
 ```
 
 chopdiff’s upper bound is why the install log said `flexdoc 0.3.0`, not 0.4.0.
@@ -129,7 +202,7 @@ If those tests fail only because sizes changed, prefer `TextUnit.raw_words`
 at the call sites that want the old measure, or accept the new sizes and
 bump chopdiff’s minor (pre-1.0 break).
 
-### First-party cool-off
+### First-Party Cool-Off
 
 kash-shell, kash-docs, and kash-media list flexdoc and chopdiff at
 `2099-12-31`, so a same-day tag resolves.
@@ -145,7 +218,7 @@ flexdoc 0.4.0 was published 2026-07-20.
 That cutoff must become a first-party exemption (`2099-12-31`) before
 chopdiff can lock 0.4.1.
 
-### Checkout notes
+### Checkout Notes
 
 | Repo | GitHub | Local note |
 | --- | --- | --- |
@@ -159,23 +232,26 @@ chopdiff can lock 0.4.1.
 
 ### Approach
 
-**Immediate unblock (no chopdiff release required):** tag flexdoc `v0.3.1`.
+**Immediate unblock (no chopdiff release required):** tag flexdoc `v0.3.1`
+after user signoff.
 Published chopdiff 0.4.0 already accepts it.
 Published kash-media 0.4.9 already says `flexdoc>=0.3.0`.
 
 **Coordinated train (chopdiff in the set):**
 
-1. Same cydifflib drop on flexdoc `main` → `v0.4.1`.
-2. chopdiff: point at `flexdoc>=0.4.1,<0.5`, fix the dated cool-off exception,
+1. Same cydifflib drop on flexdoc `main` → PR, then `v0.4.1` after signoff.
+2. chopdiff: point at `flexdoc>=0.4.1,<0.5`, set cool-off to `2099-12-31`,
    run the suite (div chunking with `TextUnit.words`, sliding windows,
-   token diffs), PR, tag.
+   token diffs), PR.
+   Tag only after flexdoc 0.4.1 is on PyPI and the user signs off.
 3. kash-shell, kash-docs, kash-media: `flexdoc>=0.4.1` and
-   `chopdiff>=<new chopdiff tag>`; relock; kash-media classifier + README.
+   `chopdiff>=<new chopdiff tag>`; relock; kash-media `requires-python` +
+   README.
 
 Work on the chopdiff PR can start against a path or git dep on the flexdoc
 0.4.1 branch; the lock and tag wait for PyPI 0.4.1.
 
-### Backward compatibility
+### Backward Compatibility
 
 - **Internal code (flexdoc cydifflib):** DO NOT MAINTAIN.
 - **Library APIs (flexdoc):** DO NOT MAINTAIN for the import path.
@@ -204,7 +280,7 @@ chopdiff: none unless 0.4.x forces `TextUnit.words` call sites to
 | chopdiff | `flexdoc>=0.4.1,<0.5`; first-party cool-off; relock; tests | `v0.4.1` or `v0.5.0` |
 | kash-shell | `flexdoc>=0.4.1`; `chopdiff>=` new tag; relock | optional `v0.4.12` |
 | kash-docs | same pins; relock from GitHub `main` | optional 0.2.8 |
-| kash-media | same pins; relock; classifier + README | optional `v0.4.10` |
+| kash-media | same pins; relock; GIL 3.14 + README `--python` | optional `v0.4.10` |
 
 ## Implementation Plan
 
@@ -213,33 +289,37 @@ Phase 1 unblocks the already-published kash packages.
 Phase 2 is chopdiff.
 Phase 3 is the three kash PRs (one each; do not land 0.3.1-only consumer PRs
 and then redo them).
+Tags are a later step, after user signoff.
 
-### Phase 1: Flexdoc patches and releases
+### Phase 1: Flexdoc Patches
 
-- [ ] From `v0.3.0`, replace `import cydifflib as difflib` with `import difflib`
+- [x] From `v0.3.0`, replace `import cydifflib as difflib` with `import difflib`
       and remove `cydifflib>=1.2.0` from `pyproject.toml`
-- [ ] Relock; run lint and the token-diff / golden tests
-- [ ] PR on a `release/0.3.1` (or equivalent) branch; merge
-- [ ] Tag `v0.3.1` (GitHub Release → `publish.yml` → PyPI)
-- [ ] Repeat the same change on `origin/main` for `v0.4.1`
+- [x] Relock; run lint and the token-diff / golden tests
+- [x] PR: [jlevy/flexdoc#24](https://github.com/jlevy/flexdoc/pull/24) (`release/0.3.x`)
+- [x] Repeat the same change on `origin/main` for the 0.4.1 PR
+      ([jlevy/flexdoc#25](https://github.com/jlevy/flexdoc/pull/25))
+- [ ] After signoff: tag `v0.3.1` and `v0.4.1` (GitHub Release → `publish.yml` →
+      PyPI)
 - [ ] Confirm PyPI metadata for 0.3.1 and 0.4.1 has no `cydifflib`
-- [ ] From `/tmp`, `uv tool install --force kash-media` with no `--python`
-      (proves 0.3.1 unblocks the current graph)
+- [ ] From `/tmp`, `uv tool install --force --python 3.13 kash-media` and
+      `--python 3.14` (proves 0.3.1 unblocks the current graph on GIL Pythons)
 
-### Phase 2: Chopdiff adopts flexdoc 0.4.1
+### Phase 2: Chopdiff Adopts Flexdoc 0.4.1
 
 Repo: [jlevy/chopdiff](https://github.com/jlevy/chopdiff) (`../chopdiff`).
 
-- [ ] Set `[tool.uv.exclude-newer-package] flexdoc = "2099-12-31T00:00:00Z"`
-      (or delete the dated 2026-07-12 override if the global first-party
-      exemption already covers it)
-- [ ] Change the dep to `flexdoc>=0.4.1,<0.5`
-- [ ] `uv lock --upgrade-package flexdoc`
-- [ ] Run `make lint` and `make test`, including
+- [x] Set `[tool.uv.exclude-newer-package] flexdoc = "2099-12-31T00:00:00Z"`
+- [x] Change the dep to `flexdoc>=0.4.1,<0.5`
+- [x] Lock against the flexdoc 0.4.1 PR branch (git source). Relock from PyPI
+      after 0.4.1 is tagged
+- [x] Run `make lint` and `make test`, including
       `tests/divs/test_div_elements.py` and transform / `token_diffs` tests
-- [ ] If `TextUnit.words` sizes change: either switch those call sites to
-      `TextUnit.raw_words` (keep 0.4.1) or accept the new sizes and tag 0.5.0
-- [ ] PR; tag after merge and green CI
+      (`TextUnit.words` sizes unchanged → chopdiff 0.4.1, not 0.5.0)
+- [x] PR: [jlevy/chopdiff#33](https://github.com/jlevy/chopdiff/pull/33)
+      (cannot release until flexdoc 0.4.1 is tagged)
+- [ ] After signoff: drop the git source, relock from PyPI, tag once CI is
+      green
 
 ### Phase 3: kash-shell, kash-docs, kash-media
 
@@ -250,7 +330,7 @@ They are independent of each other.
 
 - [ ] Update `main`
 - [ ] `flexdoc>=0.4.1` and `chopdiff>=` the new chopdiff tag
-- [ ] Relock; PR; optional `v0.4.12`
+- [ ] Relock; PR; optional `v0.4.12` after signoff
 
 **kash-docs** ([jlevy/kash-docs](https://github.com/jlevy/kash-docs))
 
@@ -258,23 +338,27 @@ Needed for lock and lower-bound hygiene on the 0.2.7 line, not for the first
 install fix after flexdoc 0.3.1.
 
 - [ ] Start from GitHub `main` at 0.2.7, not the stale local tree
-- [ ] Same flexdoc and chopdiff pins; relock; PR; optional 0.2.8
+- [ ] Same flexdoc and chopdiff pins; relock; PR; optional 0.2.8 after
+      signoff
 
 **kash-media** (this repo)
 
 - [ ] Same flexdoc and chopdiff pins; relock
-- [ ] Remove the `Programming Language :: Python :: 3.14` classifier
-- [ ] README: `uv tool install --python 3.13 kash-media ...`
-      Keep `requires-python = ">=3.13,<3.14"`
-- [ ] PR; optional `v0.4.10`
+- [ ] Set `requires-python = ">=3.13,<3.15"`; keep the 3.14 classifier
+- [ ] Drop the stale onnxruntime 3.14-wheels comment
+- [ ] README / installation: `uv tool install --python 3.13 kash-media` or
+      `--python 3.14` (GIL). Do not document 3.14t
+- [ ] PR; optional `v0.4.10` after signoff
 
 **Verify again** from `/tmp` after Phase 3 tags (or after PyPI has 0.4.1 +
 new chopdiff, even before kash consumer tags):
 
-- [ ] `uv tool install --force kash-media` (no `--python`) does not build
-      cydifflib and resolves flexdoc >=0.3.1 (and 0.4.1 once chopdiff allows it)
-- [ ] `uvx kash-shell@latest` with no `--python` succeeds
-- [ ] `--python 3.13` still succeeds
+- [ ] `uv tool install --force --python 3.13 kash-media` and
+      `--python 3.14` do not build cydifflib and resolve flexdoc >=0.3.1
+      (and 0.4.1 once chopdiff allows it)
+- [ ] `uvx --python 3.13 kash-shell@latest` and `--python 3.14` succeed
+- [ ] Do not expect a bare install with no `--python` to succeed if uv
+      selects 3.14t
 
 ## Testing Strategy
 
@@ -296,31 +380,37 @@ new chopdiff, even before kash consumer tags):
 
 **release smoke (required, packaged artifact)**
 
-After flexdoc 0.3.1, and again after chopdiff + flexdoc 0.4.1:
+After flexdoc 0.3.1, and again after chopdiff + flexdoc 0.4.1, from a
+directory with no Python pin:
 
 ```shell
 uv tool uninstall kash-media || true
-uv tool install --force kash-media
-uvx kash-shell@latest --help
+uv tool install --force --python 3.13 kash-media
+uv tool install --force --python 3.14 kash-media
+uvx --python 3.13 kash-shell@latest --help
+uvx --python 3.14 kash-shell@latest --help
 ```
 
-Run from a directory with no Python pin.
 Do not treat `make test` in a 3.13 project venv as evidence the tool install
 works.
+Do not treat a bare `uv tool install` with no `--python` as the success
+criterion.
 
 ## Rollout Plan
 
 Release identity is the git tag (`vX.Y.Z`).
 Each package uses that repo’s `docs/publishing.md` (`publish.yml` trusted
 publisher).
+This pass files PRs only.
 
-| Order | Tag | Why this order |
+| Order | Step | Why this order |
 | --- | --- | --- |
-| 1 | flexdoc `v0.3.1` | Unblocks published kash-media / kash-shell / kash-docs immediately |
-| 2 | flexdoc `v0.4.1` | Same fix on the 0.4 line; chopdiff’s target |
-| 3 | chopdiff `v0.4.1` or `v0.5.0` | Opens `flexdoc` 0.4.x for the kash graph |
-| 4 | kash-shell / kash-docs / kash-media PRs | Same day as the chopdiff tag (no cool-off) |
-| 5 | Optional kash tags | Published lower bounds; not required once 0.3.1 exists |
+| 1 | flexdoc 0.3.1 PR | Cherry-pickable patch from `v0.3.0`; unblocks published kash the day it is tagged |
+| 2 | flexdoc 0.4.1 PR | Same fix on the 0.4 line; chopdiff’s target; parallel with (1) |
+| 3 | chopdiff PR | Opens `flexdoc` 0.4.x; cannot tag until flexdoc 0.4.1 is on PyPI |
+| 4 | User signoff, then tags | `v0.3.1`, `v0.4.1`, then chopdiff `v0.4.1` or `v0.5.0` |
+| 5 | kash-shell / kash-docs / kash-media PRs | Same day as the chopdiff tag (no cool-off) |
+| 6 | Optional kash tags | Published lower bounds; not required once 0.3.1 exists |
 
 Do not tag a consumer before its PR is merged and CI is green on `main`.
 Do not publish a kash release that requires `flexdoc>=0.4.1` before the new
@@ -332,10 +422,6 @@ Rehearse flexdoc and chopdiff with `make build` and inspect wheel
 
 ## Open Questions
 
-- **Optional kash consumer tags in this pass, or PRs only?**
-  flexdoc 0.3.1 plus the later chopdiff tag are enough for installs.
-  Recommend tagging flexdoc and chopdiff; kash tags only if we want the new
-  lower bounds on PyPI immediately.
 - **chopdiff 0.4.1 vs 0.5.0** is decided by the Phase 2 test run, not in
   advance.
 
