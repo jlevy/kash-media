@@ -1,8 +1,9 @@
 ---
 title: "Plan Spec: Unblock kash installs blocked by cydifflib on Python 3.14"
 description: >-
-  Flexdoc 0.4.1 and chopdiff 0.4.1 are on PyPI (`flexdoc[diff]`, keep
-  cydifflib). kash-media allows GIL 3.13–3.14 (`>=3.13,<3.15`). Do not
+  Flexdoc 0.4.1, chopdiff 0.4.1, kash-shell 0.4.12, and kash-docs 0.2.8
+  are on PyPI (`flexdoc[diff]`, keep cydifflib). kash-media allows GIL
+  3.13–3.14 (`>=3.13,<3.15`) and relocks those first-party pins. Do not
   drop cydifflib. Do not claim 3.14t. Do not merge flexdoc 24/25.
 ---
 # Feature: Unblock kash Installs Blocked by cydifflib on Python 3.14
@@ -22,9 +23,9 @@ the release train. See Diagnosis.
 
 **Author:** Joshua Levy
 
-**Status:** Active (flexdoc `v0.4.1` and chopdiff `v0.4.1` on PyPI; cydifflib is
-the `diff` extra; kash-media locked on `build/gil-python-314`; kash-docs 0.2.7
-still declares `requires-python <3.14`)
+**Status:** Active (flexdoc `v0.4.1`, chopdiff `v0.4.1`, kash-shell `v0.4.12`, and
+kash-docs `v0.2.8` on PyPI; published kash-media `v0.4.10` still locks kash-docs 0.2.7 /
+kash-shell 0.4.10; this PR relocks to 0.2.8 / 0.4.12 and tags `v0.4.11`)
 
 ## Overview
 
@@ -42,30 +43,30 @@ On **GIL 3.14** that same sdist **builds and imports** (CMake compiles the shipp
 
 flexdoc uses cydifflib in one place (`token_diffs.SequenceMatcher`, `autojunk=False`).
 stdlib `difflib` is API-compatible there, but it is **not** the release default.
-chopdiff’s README (commit `0e6f81d`) states cydifflib is significantly
-faster than stdlib `difflib`. A production-path bench on CPython 3.13.7 arm64 confirmed
-**8.4× at 59 tokens; 38.7× at 2048 (2.0 ms vs 77.8 ms); 32.5× at 10k; 35.2× at 20k**
-(33–39× at WINDOW_2K). Opcodes matched stdlib.
+chopdiff’s README (commit `0e6f81d`) states cydifflib is significantly faster than
+stdlib `difflib`. A production-path bench on CPython 3.13.7 arm64 confirmed **8.4× at 59
+tokens; 38.7× at 2048 (2.0 ms vs 77.8 ms); 32.5× at 10k; 35.2× at 20k** (33–39× at
+WINDOW_2K). Opcodes matched stdlib.
 **Keep `cydifflib>=1.2.0` for token diffs.** Do not drop it for stdlib.
 Core flexdoc does not depend on it: install `flexdoc[diff]`.
 
-**One flexdoc release from `main` is done:** `v0.4.1` (`cbe2f5d`), on PyPI.
-Token diffs keep `cydifflib>=1.2.0` on the `diff` extra. **Supported = GIL 3.14.
-Unsupported = 3.14t.**
-`requires-python` includes 3.14 (`>=3.11,<3.15`) but cannot exclude 3.14t; a version
-specifier is not a GIL vs freethreaded flag. Enforcement is an import-time
+**One flexdoc release from `main` is done:** `v0.4.1` (`cbe2f5d`), on PyPI. Token diffs
+keep `cydifflib>=1.2.0` on the `diff` extra.
+**Supported = GIL 3.14. Unsupported = 3.14t.** `requires-python` includes 3.14
+(`>=3.11,<3.15`) but cannot exclude 3.14t; a version specifier is not a GIL vs
+freethreaded flag. Enforcement is an import-time
 `sysconfig.get_config_var("Py_GIL_DISABLED")` guard before `import cydifflib`, plus
 docs. flexdoc supports CPython 3.11–3.14 with the GIL, not free-threaded 3.14t; use
-`--python 3.13` or a GIL 3.14 (`uv python find 3.14` may resolve to 3.14t).
-Do **not** fork CyDifflib as part of this train.
+`--python 3.13` or a GIL 3.14 (`uv python find 3.14` may resolve to 3.14t). Do **not**
+fork CyDifflib as part of this train.
 Do **not** vendor cydifflib into flexdoc.
 Do **not** merge [jlevy/flexdoc#24](https://github.com/jlevy/flexdoc/pull/24) or
-[jlevy/flexdoc#25](https://github.com/jlevy/flexdoc/pull/25) (closed: stdlib drop;
-wrong default; superseded by #26 and #27). Do not also ship a 0.3.1 patch.
+[jlevy/flexdoc#25](https://github.com/jlevy/flexdoc/pull/25) (closed: stdlib drop; wrong
+default; superseded by #26 and #27). Do not also ship a 0.3.1 patch.
 
 Published chopdiff 0.4.1 depends on `flexdoc[diff]>=0.4.1,<0.5`. The kash-media lock
-selects flexdoc 0.4.1 and cydifflib 1.2.0 via that extra. Do not add a second flexdoc
-tag later as a “quick unblock.”
+selects flexdoc 0.4.1 and cydifflib 1.2.0 via that extra.
+Do not add a second flexdoc tag later as a “quick unblock.”
 
 A CyDifflib fork (Cython 3.2 regenerate, cp314 / optional cp314t wheels under a new PyPI
 name) is **optional**, only if we later want 3.14t to *install* cydifflib.
@@ -80,16 +81,18 @@ must be updated, or the new flexdoc will not resolve in that repo.
 
 Flexdoc `v0.4.1` and chopdiff `v0.4.1` are on PyPI. kash-media pyproject is
 `requires-python = ">=3.13,<3.15"`, `flexdoc[diff]>=0.4.1`, `chopdiff>=0.4.1`.
-kash-docs 0.2.7 still declares `requires-python <3.14`; a published
-`uv tool install` on GIL 3.14 may still fail until a new kash-docs is on PyPI.
+kash-shell 0.4.12 and kash-docs 0.2.8 allow GIL 3.14 (`>=3.11,<3.15`). Published
+kash-media 0.4.10 still locks kash-docs 0.2.7 (`<3.14`) and kash-shell 0.4.10;
+`uv tool install` on GIL 3.14 fails until this relock and `v0.4.11` are on PyPI.
 
 ## Decisions
 
 Locked 2026-09-18, updated the same day after bench, options analysis, and build-debug:
 
 - **Keep PyPI `cydifflib>=1.2.0` for token diffs, as `flexdoc[diff]`.** Do not drop it
-  for stdlib `difflib`. Core flexdoc does not depend on cydifflib. Written reason:
-  chopdiff `0e6f81d` / README. Bench: 8.4×–38.7× (33–39× at WINDOW_2K); opcodes matched.
+  for stdlib `difflib`. Core flexdoc does not depend on cydifflib.
+  Written reason: chopdiff `0e6f81d` / README. Bench: 8.4×–38.7× (33–39× at WINDOW_2K);
+  opcodes matched.
 - **No required native install fix for GIL 3.14.** Published 1.2.0 sdist builds and
   imports on GIL 3.14 if CMake and a C++ compiler are present.
   No cp314 wheel exists; the sdist is enough for GIL 3.14.
@@ -97,37 +100,40 @@ Locked 2026-09-18, updated the same day after bench, options analysis, and build
   and only for “3.14t can install cydifflib.”
   Do not start a fork in this pass.
   Vendoring into flexdoc is rejected (would make flexdoc a native cibuildwheel package).
-  Stdlib fallback is rejected. Token diffs require the `diff` extra (cydifflib).
+  Stdlib fallback is rejected.
+  Token diffs require the `diff` extra (cydifflib).
 - **Do not claim 3.14t-safe.** A regenerate-and-compile on 3.14t re-enables the GIL.
   Aiming for 3.14t to *install* cydifflib is optional later work, not this train.
   kash-media on 3.14t still dies on OpenCV.
-- **One flexdoc release, from `main`.** Shipped as `v0.4.1`. Token diffs keep
-  cydifflib on `flexdoc[diff]`.
-  Declare GIL 3.14 (`requires-python = ">=3.11,<3.15"`, keep the 3.14 classifier).
-  Do not claim 3.14t. There is no Trove classifier for “free-threading unsupported”
-  (the published levels are Unstable / Beta / Stable / Resilient); omit it.
+- **One flexdoc release, from `main`.** Shipped as `v0.4.1`. Token diffs keep cydifflib
+  on `flexdoc[diff]`. Declare GIL 3.14 (`requires-python = ">=3.11,<3.15"`, keep the
+  3.14 classifier). Do not claim 3.14t. There is no Trove classifier for “free-threading
+  unsupported” (the published levels are Unstable / Beta / Stable / Resilient); omit it.
   Do not ship 0.3.1. Do not merge #24 or #25.
 - **Enforce 3.14t at import, not only in metadata.** `requires-python` cannot express
-  GIL vs freethreaded. `uv tool install` / `uvx` can still pick
-  `3.14.7+freethreaded` even when a package says `<3.14`. Before `import cydifflib`,
-  check the **build** flag `sysconfig.get_config_var("Py_GIL_DISABLED")` (not live
-  GIL state: a 3.14t cydifflib import re-enables the GIL, so
-  `sys._is_gil_enabled()` after import is a lie). Raise a short error naming 3.14t
-  and `--python 3.13` / GIL 3.14.
+  GIL vs freethreaded.
+  `uv tool install` / `uvx` can still pick `3.14.7+freethreaded` even when a package
+  says `<3.14`. Before `import cydifflib`, check the **build** flag
+  `sysconfig.get_config_var("Py_GIL_DISABLED")` (not live GIL state: a 3.14t cydifflib
+  import re-enables the GIL, so `sys._is_gil_enabled()` after import is a lie).
+  Raise a short error naming 3.14t and `--python 3.13` / GIL 3.14.
 - **0.3.1 is cancelled** (one release, less release-branch surface).
   chopdiff 0.4.0 cannot select flexdoc `>=0.4.0`, so **chopdiff must publish before kash
   consumers see the new flexdoc.**
-- **GIL Python 3.14 is allowed for kash-media**
-  (`requires-python = ">=3.13,<3.15"`, keep the 3.14 classifier).
+- **GIL Python 3.14 is allowed for kash-media** (`requires-python = ">=3.13,<3.15"`,
+  keep the 3.14 classifier).
   The vision stack works (opencv-python 5.0.0.93 `abi3`, scikit-image).
 - **Python 3.14t is unsupported as a kash-media install target.** Install docs must say
   `--python 3.13` or a **GIL** 3.14. `uv venv -p 3.14` / `--python 3.14` is not enough
   if uv resolves 3.14t. Be explicit (for example pin a GIL build, not the freethreaded
   one).
-- **Flexdoc and chopdiff are tagged.** kash-media may tag `v0.4.10` after a green
-  merge if publish is tag-driven (`uvx kash-media@latest`).
-- **Lower-level libraries first:** flexdoc `v0.4.1` is on PyPI; next is one chopdiff
-  pin of `flexdoc[diff]`, then kash consumers.
+- **Flexdoc, chopdiff, kash-shell, and kash-docs are tagged.** kash-media `v0.4.10`
+  shipped the GIL 3.14 metadata and flexdoc/chopdiff pins but still locks kash-docs
+  0.2.7 / kash-shell 0.4.10. Tag `v0.4.11` after this relock so
+  `uv tool install kash-media` / `@latest` gets 0.2.8 / 0.4.12.
+- **Lower-level libraries first:** flexdoc `v0.4.1`, chopdiff `v0.4.1`, kash-shell
+  `v0.4.12`, and kash-docs `v0.2.8` are on PyPI. This remaining hole is the kash-media
+  lock.
 - **jlevy first-party repos have no cool-off restriction.** Use `2099-12-31` exemptions.
 
 These close dual-track 0.3.1 and 0.4.1, dropping cydifflib, vendoring into flexdoc,
@@ -264,36 +270,32 @@ Do not document 3.14t as supported.
 ```
 cydifflib 1.2.0
   ^
-flexdoc 0.3.0          flexdoc 0.4.0
-  ^                      ^
-  |                      blocked for kash by chopdiff
-chopdiff 0.4.0
-  requires flexdoc>=0.3.0,<0.4.0
-  lock exception: flexdoc cutoff 2026-07-12 (before flexdoc 0.4.0)
+flexdoc 0.4.1 (extra diff)
   ^
-kash-shell 0.4.11
-  flexdoc>=0.3.0
-  chopdiff>=0.4.0
-  requires-python >=3.11,<4.0   (claims 3.14)
+chopdiff 0.4.1
+  requires flexdoc[diff]>=0.4.1,<0.5
   ^
-kash-docs 0.2.7
-  flexdoc>=0.3.0
-  chopdiff>=0.4.0
-  kash-shell>=0.4.9,<0.5
-  requires-python >=3.11,<3.14
+kash-shell 0.4.12
+  flexdoc[diff]>=0.4.1
+  chopdiff>=0.4.1
+  requires-python >=3.11,<3.15
   ^
-kash-media 0.4.9
-  flexdoc>=0.3.0
-  chopdiff>=0.4.0
-  kash-shell>=0.4.10,<0.5
-  kash-docs>=0.2.7,<0.3
-  requires-python >=3.13,<3.14
-  classifier already lists 3.14
+kash-docs 0.2.8
+  flexdoc[diff]>=0.4.1
+  chopdiff>=0.4.1
+  kash-shell>=0.4.12,<0.5
+  requires-python >=3.11,<3.15
+  ^
+kash-media 0.4.10 (published; this PR → 0.4.11)
+  flexdoc[diff]>=0.4.1
+  chopdiff>=0.4.1
+  kash-shell>=0.4.12,<0.5   (was 0.4.10)
+  kash-docs>=0.2.8,<0.3     (was 0.2.7)
+  requires-python >=3.13,<3.15
 ```
 
-chopdiff’s upper bound is why the install log said `flexdoc 0.3.0`, not 0.4.0.
-Publishing only a flexdoc 0.4.x release still does not fix kash until a new chopdiff
-release allows `0.4.x`.
+Published kash-media 0.4.10 still locks kash-docs 0.2.7 (`requires-python <3.14`) and
+kash-shell 0.4.10. That is the remaining GIL 3.14 hole.
 
 flexdoc 0.4.0 changed `TextUnit.words` from raw whitespace counts to logical word
 metrics. chopdiff windowing uses `wordtoks` / `paragraphs` / `bytes`. `TextUnit.words`
@@ -307,8 +309,8 @@ A 0.3.1 patch would have been selectable by published chopdiff 0.4.0 without a c
 release. That dual-track is cancelled: one release from `main`, less `release/0.3.x`
 surface. **chopdiff must ship before kash sees the new flexdoc.** Do not revive 0.3.1.
 
-#24 and #25 are closed (rejected: stdlib drop is a 30–40× regression; superseded by
-#26 and #27). Do not merge or tag them.
+#24 and #25 are closed (rejected: stdlib drop is a 30–40× regression; superseded by #26
+and #27). Do not merge or tag them.
 
 ### First-Party Cool-Off
 
@@ -324,9 +326,9 @@ chopdiff still has `flexdoc = "2026-07-12T00:00:00Z"`. That cutoff must become
 | --- | --- | --- |
 | flexdoc | [jlevy/flexdoc](https://github.com/jlevy/flexdoc) | `v0.4.1` on PyPI (`cbe2f5d`): GIL 3.14; refuse 3.14t; `cydifflib` is extra `diff`. [26](https://github.com/jlevy/flexdoc/pull/26) and [27](https://github.com/jlevy/flexdoc/pull/27) merged. [24](https://github.com/jlevy/flexdoc/pull/24) and [25](https://github.com/jlevy/flexdoc/pull/25) closed. |
 | chopdiff | [jlevy/chopdiff](https://github.com/jlevy/chopdiff) | Published `v0.4.1` (`flexdoc[diff]>=0.4.1,<0.5`). [PR 33](https://github.com/jlevy/chopdiff/pull/33) merged. |
-| kash-shell | [jlevy/kash](https://github.com/jlevy/kash) | Latest tag `v0.4.11`. Consumer PR still open. |
-| kash-docs | [jlevy/kash-docs](https://github.com/jlevy/kash-docs) | Published 0.2.7 still has `requires-python <3.14`. |
-| kash-media | [jlevy/kash-media](https://github.com/jlevy/kash-media) | Spec PR #13 merged. Package branch `build/gil-python-314` locked to chopdiff 0.4.1 / flexdoc 0.4.1 / cydifflib 1.2.0. |
+| kash-shell | [jlevy/kash](https://github.com/jlevy/kash) | Published `v0.4.12` (`>=3.11,<3.15`; `flexdoc[diff]>=0.4.1`). |
+| kash-docs | [jlevy/kash-docs](https://github.com/jlevy/kash-docs) | Published `v0.2.8` (`>=3.11,<3.15`; `kash-shell>=0.4.12`). |
+| kash-media | [jlevy/kash-media](https://github.com/jlevy/kash-media) | Published `v0.4.10` still locks kash-docs 0.2.7 / kash-shell 0.4.10. This PR relocks to 0.2.8 / 0.4.12 and tags `v0.4.11`. |
 
 ## Design
 
@@ -341,9 +343,12 @@ vendor, or fork for this train.
    keep cydifflib on extra `diff`; `requires-python = ">=3.11,<3.15"`; import-time
    `Py_GIL_DISABLED` guard before `cydifflib`; do not claim 3.14t.
 2. One chopdiff pin: `flexdoc[diff]>=0.4.1,<0.5`, cool-off `2099-12-31`, relock from
-   PyPI, re-confirm `TextUnit.words` tests. **Done:** chopdiff `v0.4.1` on PyPI.
+   PyPI, re-confirm `TextUnit.words` tests.
+   **Done:** chopdiff `v0.4.1` on PyPI.
 3. kash-shell, kash-docs, kash-media: new lower bounds; kash-media `requires-python` and
-   install docs (explicit GIL pin). kash-media lock is ready.
+   install docs (explicit GIL pin).
+   kash-shell `v0.4.12` and kash-docs `v0.2.8` are on PyPI. kash-media still needs this
+   relock and `v0.4.11`.
 
 Optional later, not this train: fork CyDifflib, regenerate with Cython 3.2, publish
 cp314 (and cp314t if cheap) under a new PyPI name so 3.14t can *install* cydifflib.
@@ -355,15 +360,16 @@ Upstream ping can start without a fork.
   `flexdoc[diff]` (`cydifflib>=1.2.0`). No stdlib fallback.
 - **Library APIs (flexdoc token_diffs):** no public flexdoc API exposes `cydifflib`.
 - **chopdiff ↔ flexdoc 0.4.x:** VERSION and FAIL FAST on the pin
-  (`flexdoc[diff]>=0.4.1,<0.5`). Phase 2 against the drop PR: sizes unchanged →
-  chopdiff 0.4.1. Re-confirm against keep-cydifflib `main` / PyPI 0.4.1.
+  (`flexdoc[diff]>=0.4.1,<0.5`). Phase 2 against the drop PR: sizes unchanged → chopdiff
+  0.4.1. Re-confirm against keep-cydifflib `main` / PyPI 0.4.1.
 - **Server APIs / plugins / file formats / persisted state / schemas:** N/A.
 
 ### API Changes
 
-flexdoc: none at `token_diffs` besides the import-time `Py_GIL_DISABLED` guard and
-the lazy `flexdoc[diff]` import. `requires-python` is `>=3.11,<3.15`. 3.14
-classifier stays. No free-threading classifier (no “unsupported” Trove level exists).
+flexdoc: none at `token_diffs` besides the import-time `Py_GIL_DISABLED` guard and the
+lazy `flexdoc[diff]` import.
+`requires-python` is `>=3.11,<3.15`. 3.14 classifier stays.
+No free-threading classifier (no “unsupported” Trove level exists).
 
 chopdiff: none unless 0.4.x forces `TextUnit.raw_words` or new expected sizes.
 
@@ -373,9 +379,9 @@ chopdiff: none unless 0.4.x forces `TextUnit.raw_words` or new expected sizes.
 | --- | --- | --- |
 | flexdoc | One release from `main`; `cydifflib` on extra `diff`; `>=3.11,<3.15`; `Py_GIL_DISABLED` guard | **shipped** `v0.4.1` |
 | chopdiff | `flexdoc[diff]>=0.4.1,<0.5`; first-party cool-off; relock; tests | `v0.4.1` (tests passed; else `v0.5.0`) |
-| kash-shell | new flexdoc and chopdiff lower bounds; relock | optional `v0.4.12` |
-| kash-docs | same pins; relock from GitHub `main` | optional 0.2.8 |
-| kash-media | same pins; relock; GIL 3.14 and explicit `--python` docs | optional `v0.4.10` |
+| kash-shell | new flexdoc and chopdiff lower bounds; relock | **shipped** `v0.4.12` |
+| kash-docs | same pins; allow GIL 3.14; relock | **shipped** `v0.2.8` |
+| kash-media | same pins; relock; GIL 3.14 and explicit `--python` docs | shipped `v0.4.10`; next `v0.4.11` |
 
 ## Implementation Plan
 
@@ -395,14 +401,15 @@ Flexdoc is tagged. Chopdiff and kash tags wait for user signoff.
 - [x] Hard-drop PRs opened and rejected for merge:
   [jlevy/flexdoc#24](https://github.com/jlevy/flexdoc/pull/24),
   [jlevy/flexdoc#25](https://github.com/jlevy/flexdoc/pull/25)
-- [x] New PR from `main` (not #24/#25): [jlevy/flexdoc#26](https://github.com/jlevy/flexdoc/pull/26).
-  GIL 3.14; `Py_GIL_DISABLED` guard; does not claim 3.14t
-- [x] Follow-up [jlevy/flexdoc#27](https://github.com/jlevy/flexdoc/pull/27): `cydifflib`
-  is extra `diff` only
+- [x] New PR from `main` (not #24/#25):
+  [jlevy/flexdoc#26](https://github.com/jlevy/flexdoc/pull/26). GIL 3.14;
+  `Py_GIL_DISABLED` guard; does not claim 3.14t
+- [x] Follow-up [jlevy/flexdoc#27](https://github.com/jlevy/flexdoc/pull/27):
+  `cydifflib` is extra `diff` only
 - [x] After signoff: merge #26 and #27, tag **one** flexdoc version from `main`
   (`v0.4.1` at `cbe2f5d`)
-- [x] Confirm PyPI `flexdoc==0.4.1`: default `Requires-Dist` has no `cydifflib`;
-  extra `diff` requires `cydifflib>=1.2.0`
+- [x] Confirm PyPI `flexdoc==0.4.1`: default `Requires-Dist` has no `cydifflib`; extra
+  `diff` requires `cydifflib>=1.2.0`
 - [x] Do **not** tag `v0.3.1`. #24 and #25 closed, not merged
 
 ### Phase 2: One Chopdiff Pin
@@ -418,16 +425,15 @@ Repo: [jlevy/chopdiff](https://github.com/jlevy/chopdiff).
 
 ### Phase 3: kash-shell, kash-docs, kash-media
 
-Chopdiff `v0.4.1` is on PyPI. kash-media lock is ready on `build/gil-python-314`.
+Chopdiff `v0.4.1`, kash-shell `v0.4.12`, and kash-docs `v0.2.8` are on PyPI.
 
 **kash-shell** ([jlevy/kash](https://github.com/jlevy/kash))
 
-- [ ] New flexdoc and chopdiff lower bounds; relock; PR; optional `v0.4.12`
+- [x] New flexdoc and chopdiff lower bounds; relock; PR; `v0.4.12`
 
 **kash-docs** ([jlevy/kash-docs](https://github.com/jlevy/kash-docs))
 
-- [ ] From GitHub `main` at 0.2.7; same pins; allow GIL 3.14
-  (`requires-python` today is `<3.14`); relock; PR; optional 0.2.8
+- [x] Same pins; allow GIL 3.14 (`>=3.11,<3.15`); relock; PR; `v0.2.8`
 
 **kash-media** (this repo)
 
@@ -437,12 +443,13 @@ Chopdiff `v0.4.1` is on PyPI. kash-media lock is ready on `build/gil-python-314`
 - [x] README / installation: `--python 3.13` or an explicit **GIL** 3.14. State that
   `uv venv -p 3.14` / `--python 3.14` can resolve 3.14t. Do not document 3.14t as
   supported
-- [ ] PR; optional `v0.4.10` after a green merge if publish is tag-driven
+- [x] PR #14; `v0.4.10` (still locked kash-docs 0.2.7 / kash-shell 0.4.10)
+- [ ] Relock `kash-shell>=0.4.12,<0.5` and `kash-docs>=0.2.8,<0.3`; PR; tag `v0.4.11`
 
-**Verify** from `/tmp` after Phase 2 tags:
+**Verify** from `/tmp` after `v0.4.11` is on PyPI:
 
 - [ ] `uv tool install --force` with an explicit **GIL** 3.13 and **GIL** 3.14 succeeds
-  and still includes cydifflib (only after chopdiff allows 0.4.x)
+  and still includes cydifflib
 - [ ] `uvx` with the same GIL pins succeeds
 - [ ] Do not expect a bare install, or `--python 3.14` that resolves 3.14t, to succeed
 
@@ -453,8 +460,8 @@ Chopdiff `v0.4.1` is on PyPI. kash-media lock is ready on `build/gil-python-314`
 - `token_diffs` tests and golden docs
 - Guard: `is_gil_disabled_build()` is False on a GIL runner and True when
   `Py_GIL_DISABLED` is mocked
-- Built wheel `Requires-Dist` must list `cydifflib` **only** as
-  `extra == "diff"` (confirmed on PyPI 0.4.1)
+- Built wheel `Requires-Dist` must list `cydifflib` **only** as `extra == "diff"`
+  (confirmed on PyPI 0.4.1)
 
 **cydifflib (done)**
 
@@ -492,19 +499,21 @@ Do not treat a flexdoc-only publish as enough (`chopdiff 0.4.0` still selects fl
 
 ## Rollout Plan
 
-Release identity is the git tag (`vX.Y.Z`). Flexdoc `v0.4.1` is tagged. This pass does
-not tag chopdiff or kash, fork CyDifflib, or merge #24/#25.
+Release identity is the git tag (`vX.Y.Z`). Flexdoc `v0.4.1` is tagged.
+This pass does not tag chopdiff or kash, fork CyDifflib, or merge #24/#25.
 
-1. Keep `cydifflib>=1.2.0` for token diffs (decided). Extra `diff`, not a default dep.
+1. Keep `cydifflib>=1.2.0` for token diffs (decided).
+   Extra `diff`, not a default dep.
    No required fork or vendor.
 2. Flexdoc PRs from `main` (not #24/#25): #26 GIL guard; #27 `flexdoc[diff]`. Drop PRs
    closed.
 3. User signoff, then one flexdoc tag from `main` (**done:** `v0.4.1`).
-4. One chopdiff pin of `flexdoc[diff]>=0.4.1,<0.5` from PyPI; user signoff; tag
-   chopdiff (planned 0.4.1). This is the step that makes the new flexdoc visible to
-   kash.
-5. kash-shell / kash-docs / kash-media PRs the same day as the chopdiff tag.
-6. Optional kash tags.
+4. One chopdiff pin of `flexdoc[diff]>=0.4.1,<0.5` from PyPI; user signoff; tag chopdiff
+   (planned 0.4.1). This is the step that makes the new flexdoc visible to kash.
+5. kash-shell / kash-docs / kash-media PRs the same day as the chopdiff tag (shell
+   `v0.4.12` and docs `v0.2.8` shipped).
+6. kash-media `v0.4.10` shipped the GIL metadata; tag `v0.4.11` after the 0.2.8 / 0.4.12
+   relock so `@latest` gets the new lock.
 7. Smoke-test GIL 3.13 and GIL 3.14 from `/tmp`. Confirm cydifflib is in the graph.
 
 Do not publish a kash release that requires `flexdoc>=0.4.1` before the new chopdiff is
@@ -524,12 +533,12 @@ Rehearse with `make build` and inspect `Requires-Dist` (`cydifflib` only on extr
 Closed: dual-track 0.3.1 and 0.4.1. Closed: drop cydifflib.
 Closed: vendor into flexdoc.
 Closed: stdlib fallback as default.
-Closed: must-fork for GIL 3.14.
-Closed: GIL 3.14 vs `<3.14`. **Supported = GIL 3.14; unsupported = 3.14t.**
-flexdoc `requires-python = ">=3.11,<3.15"` (includes 3.14, cannot exclude 3.14t).
-Enforcement is import-time `Py_GIL_DISABLED` plus docs, not metadata alone.
-Closed: flexdoc 0.4.1 contents and tag. GIL 3.14; `cydifflib` on extra `diff`; no
-stdlib fallback. Tagged `v0.4.1` (`cbe2f5d`); on PyPI.
+Closed: must-fork for GIL 3.14. Closed: GIL 3.14 vs `<3.14`. **Supported = GIL 3.14;
+unsupported = 3.14t.** flexdoc `requires-python = ">=3.11,<3.15"` (includes 3.14, cannot
+exclude 3.14t). Enforcement is import-time `Py_GIL_DISABLED` plus docs, not metadata
+alone. Closed: flexdoc 0.4.1 contents and tag.
+GIL 3.14; `cydifflib` on extra `diff`; no stdlib fallback.
+Tagged `v0.4.1` (`cbe2f5d`); on PyPI.
 
 ## References
 
@@ -539,8 +548,9 @@ stdlib fallback. Tagged `v0.4.1` (`cbe2f5d`); on PyPI.
 - chopdiff rationale: commit `0e6f81d`,
   [README.md](https://github.com/jlevy/chopdiff/blob/main/README.md)
 - chopdiff pin and dated exception: `pyproject.toml`
-- Published pins: PyPI `kash-media` 0.4.9, `kash-shell` 0.4.11, `kash-docs` 0.2.7,
-  `chopdiff` 0.4.0, `flexdoc` 0.4.1 (`diff` extra), `cydifflib` 1.2.0
+- Published pins: PyPI `kash-media` 0.4.10 (still locks docs 0.2.7 / shell 0.4.10),
+  `kash-shell` 0.4.12, `kash-docs` 0.2.8, `chopdiff` 0.4.1, `flexdoc` 0.4.1 (`diff`
+  extra), `cydifflib` 1.2.0
 - Flexdoc release: [v0.4.1](https://github.com/jlevy/flexdoc/releases/tag/v0.4.1),
   [publish run](https://github.com/jlevy/flexdoc/actions/runs/35413395310)
 - Flexdoc PRs: [26](https://github.com/jlevy/flexdoc/pull/26) (GIL 3.14 / 3.14t guard);
