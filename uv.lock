@@ -1263,7 +1263,7 @@ requires-dist = [
     { name = "flexdoc", extras = ["diff"], specifier = ">=0.4.1" },
     { name = "flowmark", specifier = ">=0.7.2" },
     { name = "kash-docs", specifier = ">=0.2.8,<0.3" },
-    { name = "kash-shell", specifier = ">=0.4.12,<0.5" },
+    { name = "kash-shell", specifier = ">=0.4.13,<0.5" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
     { name = "scikit-image", specifier = ">=0.25.2" },
     { name = "sidematter-format", specifier = ">=0.1.0" },
@@ -1289,7 +1289,7 @@ dev = [
 
 [[package]]
 name = "kash-shell"
-version = "0.4.12"
+version = "0.4.13"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiolimiter" },
@@ -1348,9 +1348,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "xonsh" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d3/ba/293b7d9f11dd67f3911e227b5c71b4f7b508b5757682e60473d07781d07b/kash_shell-0.4.12.tar.gz", hash = "sha256:afc405eb882f6412025502b4d5f8270ffc43ce6e7661499854bf5c1c248ba85f", size = 829489, upload-time = "2026-09-19T02:34:05.716Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/34/d8/713a2369aa16a5f4e706f9ef83c6978531d81dadba0934c1930fb9336514/kash_shell-0.4.13.tar.gz", hash = "sha256:af999ac3ac3d08b2c492398358a4f81e4d39d39c0352e0941e318bcb55d8c72d", size = 832403, upload-time = "2026-09-19T08:20:29.315Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d5/92/af39926d99e0367e39c484a04ccf81cafd0a422ffc9e461569063214c084/kash_shell-0.4.12-py3-none-any.whl", hash = "sha256:13c881f6ed31627cb164bd7a111266d591ca517ccf73c51d7440f56ac0e86822", size = 601297, upload-time = "2026-09-19T02:34:04.155Z" },
+    { url = "https://files.pythonhosted.org/packages/51/0e/9e5ccd314a0d30b11d13be3052cb61dd61eccc99cff6184230331f46650e/kash_shell-0.4.13-py3-none-any.whl", hash = "sha256:819879068cff81deb7f4b9e3971fb653234db497449a1b3530c4da25efcab542", size = 603037, upload-time = "2026-09-19T08:20:27.319Z" },
 ]
 
 [[package]]
