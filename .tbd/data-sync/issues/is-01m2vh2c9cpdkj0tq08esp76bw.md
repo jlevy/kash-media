@@ -5,13 +5,13 @@ title: Verify uv tool install and uvx with --python 3.13 and 3.14
 kind: task
 status: closed
 priority: 1
-version: 8
+version: 9
 spec_path: docs/project/specs/active/plan-2026-09-18-cydifflib-python314-install.md
 labels: []
 dependencies: []
 parent_id: is-01m2vh29mhfpyb261xnxvkd6tm
 created_at: 2026-09-19T00:29:12.363Z
-updated_at: 2026-09-19T04:41:44.831Z
+updated_at: 2026-09-19T04:43:11.722Z
 closed_at: 2026-09-19T04:41:44.830Z
 close_reason: "Verified kash-media 0.4.11: uv tool install --python 3.13 and GIL 3.14.6 venv resolve include cydifflib 1.2.0. uvx --python 3.13 kash --version is kash-shell 0.4.12. 3.14t still fails as expected."
 resolution: null

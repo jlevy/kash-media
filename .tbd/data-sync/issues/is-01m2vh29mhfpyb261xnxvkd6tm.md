@@ -5,7 +5,7 @@ title: Unblock kash installs blocked by cydifflib on Python 3.14
 kind: epic
 status: closed
 priority: 1
-version: 28
+version: 29
 spec_path: docs/project/specs/active/plan-2026-09-18-cydifflib-python314-install.md
 labels: []
 dependencies: []
@@ -25,7 +25,7 @@ child_order_hints:
   - is-01m2vh2c9cpdkj0tq08esp76bw
   - is-01m2vszxvbbvb8c6xqec8ycqgb
 created_at: 2026-09-19T00:29:09.647Z
-updated_at: 2026-09-19T04:41:45.175Z
+updated_at: 2026-09-19T04:43:11.647Z
 closed_at: 2026-09-19T04:41:45.174Z
 close_reason: "Train complete: flexdoc 0.4.1, chopdiff 0.4.1, kash-shell 0.4.12, kash-docs 0.2.8, kash-media 0.4.11 on PyPI. GIL 3.13/3.14 resolve works; 3.14t unsupported. cydifflib kept."
 resolution: null
