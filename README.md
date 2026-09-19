@@ -2,12 +2,17 @@
 
 See the main [kash](https://github.com/jlevy/kash) repo for general instructions.
 
-To run kash with the the media kit features enabled, ensure you have uv set up then:
+To run kash with the media kit features enabled, ensure you have uv set up then:
 
 ```shell
-uv tool install kash-media --upgrade --force
+# Pin GIL 3.13. Bare `uv tool install` / `uv python find 3.14` may pick
+# freethreaded 3.14t, which is unsupported (cydifflib sdist and OpenCV).
+uv tool install kash-media --upgrade --force --python 3.13
 kash
 ```
+
+GIL CPython 3.14 also works if you pass that interpreter explicitly.
+`--python 3.14` is not enough when uv resolves 3.14t.
 
 Or for dev builds from within this git repo:
 
