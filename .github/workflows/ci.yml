@@ -28,7 +28,7 @@ jobs:
         # Update this as needed:
         # Common platforms: ["ubuntu-latest", "macos-latest", "windows-latest"]
         os: ["ubuntu-latest"]
-        # kash-media requires Python 3.13 exactly (onnxruntime lacks 3.14 wheels).
+        # Supported: GIL CPython 3.13 and 3.14. Freethreaded 3.14t is unsupported.
         python-version: ["3.13"]
 
     # Linux only by default. Use ${{ matrix.os }} for other OSes.

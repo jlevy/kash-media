@@ -15,8 +15,9 @@ readme = "README.md"
 license = "AGPL-3.0-or-later"
 # Have seen some hard crashes on 3.13.6 on macOS (possibly related to joblib/loky)
 # but it seems they are fixed in 3.13.7.
-# Note onnxruntime doesn't have Python 3.14 wheels yet.
-requires-python = ">=3.13,<3.14"
+# GIL CPython 3.14 is supported. Freethreaded 3.14t is not (cydifflib sdist and
+# OpenCV). requires-python cannot express GIL vs freethreaded; see the install docs.
+requires-python = ">=3.13,<3.15"
 dynamic = ["version"]
 
 # https://pypi.org/classifiers/
@@ -55,8 +56,9 @@ dependencies = [
     "typing-extensions>=4.11.1",
     # Content tools:
     "flowmark>=0.7.2",
-    "flexdoc>=0.3.0",
-    "chopdiff>=0.4.0",
+    # [diff] keeps cydifflib on the token-diff path (flexdoc 0.4.1 made it optional).
+    "flexdoc[diff]>=0.4.1",
+    "chopdiff>=0.4.1",
     # "simplemma>=1.1.2",
     # For downloading media:
     "yt-dlp>=2026.6.9",
