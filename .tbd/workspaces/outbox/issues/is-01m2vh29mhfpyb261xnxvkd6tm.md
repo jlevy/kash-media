@@ -5,7 +5,7 @@ title: Unblock kash installs blocked by cydifflib on Python 3.14
 kind: epic
 status: in_progress
 priority: 1
-version: 24
+version: 25
 spec_path: docs/project/specs/active/plan-2026-09-18-cydifflib-python314-install.md
 labels: []
 dependencies: []
@@ -24,10 +24,10 @@ child_order_hints:
   - is-01m2vh2byn9cnvxf5z7n5jgpb6
   - is-01m2vh2c9cpdkj0tq08esp76bw
 created_at: 2026-09-19T00:29:09.647Z
-updated_at: 2026-09-19T01:22:10.796Z
+updated_at: 2026-09-19T01:42:48.791Z
 ---
 One flexdoc release from main that keeps PyPI cydifflib>=1.2.0, then one chopdiff pin, then kash-shell / kash-docs / kash-media. GIL 3.14 already builds published cydifflib; a CyDifflib fork is optional and not on this train. 0.3.1 is cancelled. Do not drop cydifflib. Do not merge flexdoc 24/25.
 
 ## Notes
 
-Build-debug locked 2026-09-18: GIL 3.14 sdist works; 3.14t is Cython 3.0.x + freethreaded. New flexdoc PR: kashm-qbj5. Do not merge https://github.com/jlevy/flexdoc/pull/24 or https://github.com/jlevy/flexdoc/pull/25. Chopdiff PR: https://github.com/jlevy/chopdiff/pull/33 (retarget off the drop branch). No tags until user signoff. Do not start a fork. Do not start consumer PRs yet.
+flexdoc v0.4.1 released (cbe2f5d, extra=diff). #24/#25 closed. Next: chopdiff pin of flexdoc[diff] (kashm-0po5). Do not tag chopdiff or kash yet.
