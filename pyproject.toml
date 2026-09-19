@@ -46,11 +46,13 @@ dependencies = [
     # kash.config), so declare it rather than leaning on kash-docs to supply it.
     # 0.4.10 is the first release whose MediaMetadata accepts the discovery fields the
     # YouTube extractor passes below; on 0.4.9 every metadata fetch raises TypeError.
-    "kash-shell>=0.4.10,<0.5",
+    # 0.4.12 is the first shell that allows GIL 3.14 and pins flexdoc[diff]>=0.4.1.
+    "kash-shell>=0.4.12,<0.5",
     # Plain kash-docs (no [full]): media tools never used the PDF/browser features,
     # so this drops docling/torch/playwright from the media install entirely. Add
     # kash-docs[pdf] or [browser] explicitly if that ever changes.
-    "kash-docs>=0.2.7,<0.3",
+    # 0.2.8 is the first docs release that allows GIL 3.14 (0.2.7 was <3.14).
+    "kash-docs>=0.2.8,<0.3",
     "sidematter-format>=0.1.0",
     # Utilities:
     "typing-extensions>=4.11.1",
@@ -97,7 +99,7 @@ required-version = ">=0.9"
 exclude-newer = "14 days"
 # Per-package exceptions to the cool-off (remove each at the next routine upgrade
 # once it ages past the global window):
-# - kash-docs 0.2.7 and kash-shell 0.4.9: first-party releases published in this
+# - kash-docs 0.2.8 and kash-shell 0.4.12: first-party releases published in this
 #   release train from jlevy CI (trusted publishing, watched end to end).
 # - pillow 12.3.0 (2026-07-01): security-fix release (PYSEC-2026-2254/2256/2257).
 constraint-dependencies = ["pillow>=12.3.0"]
